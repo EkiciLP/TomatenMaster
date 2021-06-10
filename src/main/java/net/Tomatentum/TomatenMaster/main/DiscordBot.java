@@ -29,6 +29,7 @@ public class DiscordBot {
 	private ReactionRoleManager reactionRole;
 
 	public DiscordBot() throws LoginException, InterruptedException {
+		if (config.getYML().getString("TOKEN").equals(""))
 		config = new Config();
 		buildbot = JDABuilder.createDefault(config.getYML().getString("TOKEN"));
 		buildbot.setStatus(OnlineStatus.IDLE);
