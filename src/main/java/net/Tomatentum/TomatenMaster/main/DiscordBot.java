@@ -30,7 +30,7 @@ public class DiscordBot {
 
 	public DiscordBot() throws LoginException, InterruptedException {
 		config = new Config();
-		buildbot = JDABuilder.createDefault("Nzc2NTAzMjU0Mzg0MjQ2Nzg1.X611Ag.64wBWGTmk0hdwP-5tRye1PU1dAc");
+		buildbot = JDABuilder.createDefault(config.getYML().getString("TOKEN"));
 		buildbot.setStatus(OnlineStatus.IDLE);
 		buildbot.addEventListeners(new CommandListener(this));
 		buildbot.addEventListeners(new VoiceListener(this));
