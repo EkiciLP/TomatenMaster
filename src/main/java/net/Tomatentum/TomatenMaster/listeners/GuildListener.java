@@ -17,7 +17,6 @@ public class GuildListener extends ListenerAdapter {
 	private DiscordBot bot;
 	public GuildListener(DiscordBot bot) {
 		this.bot = bot;
-		System.out.println("gjoin init");
 	}
 
 

@@ -41,26 +41,6 @@ public class EditEmbedCommand implements GuildCommand {
 
 
 		 */
-		EmbedBuilder helpbuilder = new EmbedBuilder();
-		helpbuilder.setAuthor("!editembed Command Help", null, member.getUser().getAvatarUrl());
-		helpbuilder.setColor(Color.RED);
-		helpbuilder.setTitle("Unknown Usage");
-		helpbuilder.setDescription("USAGE >> !editembed <EmbedID> <EditAction> <Text/FieldID> [FieldAction] [Text]\nFor URLs we recommend https://imgur.com");
-		helpbuilder.addField("EditAction: setDescription", "!editembed <EmbedID> setDescription <Text>", false);
-		helpbuilder.addField("EditAction: setTitle", "!editembed <EmbedID> setTitle <Text>", false);
-		helpbuilder.addField("EditAction: setColor", "!editembed <EmbedID> setColor <Hex>", false);
-		helpbuilder.addField("EditAction: setAuthor", "!editembed <EmbedID> setAuthor <Text> <IconURL>", false);
-		helpbuilder.addField("EditAction: setThumbnail", "!editembed <EmbedID> setThumbnail <URL>", false);
-		helpbuilder.addField("EditAction: removeThumbnail", "!editembed <EmbedID> removeThumbnail ", false);
-		helpbuilder.addField("EditAction: setImage", "!editembed <EmbedID> setImage <URL>", false);
-		helpbuilder.addField("EditAction: removeImage", "!editembed <EmbedID> removeImage ", false);
-		helpbuilder.addField("EditAction: addField", "!editembed <EmbedID> addField <Title> ", false);
-		helpbuilder.addField("EditAction: editField", "!editembed <EmbedID> editField <FieldNumber> <FieldAction> <Text>", false);
-		helpbuilder.addField("FieldAction: setTitle", "!editembed <EmbedID> editField <FieldNumber> setTitle <Text>", true);
-		helpbuilder.addField("FieldAction: setDescription", "!editembed <EmbedID> editField <FieldNumber> setDescription <Text>", true);
-		helpbuilder.addField("FieldAction: setTitle", "!editembed <EmbedID> editField <FieldNumber> setInline <true/false>", true);
-		helpbuilder.addField("FieldAction: removeField", "!editembed <EmbedID> editField <FieldNumber> RemoveField", true);
-		helpbuilder.setFooter("- TomatenMaster Help", channel.getGuild().getIconUrl());
 		if (member.hasPermission(Permission.MESSAGE_MANAGE)) {
 			if (args.length >= 3) {
 				if (Integer.parseInt(args[1]) < bot.getConfig().getYML().getInt("Embeds.nextID")) {
@@ -83,7 +63,8 @@ public class EditEmbedCommand implements GuildCommand {
 							msg.addReaction("✔").queue();
 							break;
 						case "setcolor":
-							builder.setColor(Integer.parseInt(args[3].replace("#", "0x"), 16));
+							String color = "0xFF";
+							builder.setColor(Integer.parseInt(color.replace("FF", args[3]), 16));
 							msg.addReaction("✔").queue();
 							break;
 						case "setauthor":
@@ -99,7 +80,7 @@ public class EditEmbedCommand implements GuildCommand {
 							msg.addReaction("✔").queue();
 							break;
 						case "addfield":
-							builder.addField(args[3], " ", false);
+							builder.addField(args[3], "-", false);
 							msg.addReaction("✔").queue();
 							break;
 						case "removeimage":
@@ -110,50 +91,61 @@ public class EditEmbedCommand implements GuildCommand {
 							break;
 						case "editfield":
 							if (args.length >= 5) {
-								List<MessageEmbed.Field> fieldlist = new ArrayList<>();
-								fieldlist.addAll(builder.getFields());
-								MessageEmbed.Field oldfield = fieldlist.get(Integer.parseInt(args[3]) -1);
-								MessageEmbed.Field field = null;
-								StringBuilder stringBuilder = new StringBuilder();
-								for (int i = 5; i < args.length; i++) {
-									stringBuilder.append(args[i]).append(" ");
-								}
-								switch (args[4].toLowerCase()) {
-									case "removefield":
-										fieldlist.remove(Integer.parseInt(args[3])-1);
-										msg.addReaction("✔").queue();
-										break;
-									case "settitle":
-										field = new MessageEmbed.Field(stringBuilder.toString(), oldfield.getValue(), oldfield.isInline());
-										msg.addReaction("✔").queue();
-										break;
-									case "setdescription":
-										field = new MessageEmbed.Field(oldfield.getName(), stringBuilder.toString(), oldfield.isInline());
-										msg.addReaction("✔").queue();
-										break;
-									case "setinline":
-										field = new MessageEmbed.Field(oldfield.getName(), oldfield.getValue(), Boolean.parseBoolean(args[5]));
-										msg.addReaction("✔").queue();
-										break;
-									default:
-										msg.addReaction("❌").queue();
-										channel.sendMessage(helpbuilder.build()).complete().delete().queueAfter(10, TimeUnit.MINUTES);
-										break;
-								}
-								builder.clearFields();
-								fieldlist.set(Integer.parseInt(args[3])-1, field);
-								for (MessageEmbed.Field addfield : fieldlist) {
-									builder.addField(addfield);
-								}
-							}else {
+								if (args[4].equalsIgnoreCase("removefield") || args[4].equalsIgnoreCase("settitle") || args[4].equalsIgnoreCase("setdescription") || args[4].equalsIgnoreCase("setinline")) {
+									List<MessageEmbed.Field> fieldlist = new ArrayList<>(builder.getFields());
+									if (fieldlist.get(Integer.parseInt(args[3]) - 1) != null) {
+										MessageEmbed.Field oldfield = fieldlist.get(Integer.parseInt(args[3]) - 1);
+										MessageEmbed.Field field = null;
+										StringBuilder stringBuilder = new StringBuilder();
+										for (int i = 5; i < args.length; i++) {
+											stringBuilder.append(args[i]).append(" ");
+										}
+										switch (args[4].toLowerCase()) {
+											case "removefield":
+												List<MessageEmbed.Field> tempFields = new ArrayList<>();
+												MessageEmbed.Field fieldtoremove = fieldlist.get(Integer.parseInt(args[3]) - 1);
+												for (MessageEmbed.Field itfield : fieldlist) {
+													if (itfield != fieldtoremove)
+														tempFields.add(itfield);
+												}
+												fieldlist = tempFields;
+												msg.addReaction("✔").queue();
+												break;
+											case "settitle":
+												field = new MessageEmbed.Field(stringBuilder.toString(), oldfield.getValue(), oldfield.isInline());
+												msg.addReaction("✔").queue();
+												break;
+											case "setdescription":
+												field = new MessageEmbed.Field(oldfield.getName(), stringBuilder.toString() + "\n", oldfield.isInline());
+												msg.addReaction("✔").queue();
+												break;
+											case "setinline":
+												field = new MessageEmbed.Field(oldfield.getName(), oldfield.getValue(), Boolean.parseBoolean(args[5]));
+												msg.addReaction("✔").queue();
+												break;
+											default:
+												msg.addReaction("❌").queue();
+												sendHelp(channel);
+												break;
+										}
+										builder.clearFields();
+										fieldlist.set(Integer.parseInt(args[3]) - 1, field);
+										for (MessageEmbed.Field addfield : fieldlist) {
+											builder.addField(addfield);
+										}
+									}else
+										sendHelp(channel);
+								} else
+									sendHelp(channel);
+							} else {
 								msg.addReaction("❌").queue();
-								channel.sendMessage(helpbuilder.build()).complete().delete().queueAfter(10, TimeUnit.MINUTES);
+								sendHelp(channel);
 							}
-							break;
-						default:
-							msg.addReaction("❌").queue();
-							channel.sendMessage(helpbuilder.build()).complete().delete().queueAfter(10, TimeUnit.MINUTES);
-							break;
+								break;
+							default:
+								msg.addReaction("❌").queue();
+								sendHelp(channel);
+								break;
 					}
 					bot.getEmbedManager().editEmbed(Integer.parseInt(args[1]), builder);
 					msg.delete().queueAfter(10, TimeUnit.SECONDS);
@@ -165,7 +157,7 @@ public class EditEmbedCommand implements GuildCommand {
 				}
 			}else {
 				msg.addReaction("❌").queue();
-				channel.sendMessage(helpbuilder.build()).complete().delete().queueAfter(10, TimeUnit.MINUTES);
+				sendHelp(channel);
 			}
 		}else {
 			EmbedBuilder builder = new EmbedBuilder();
@@ -174,5 +166,28 @@ public class EditEmbedCommand implements GuildCommand {
 			channel.sendMessage(builder.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
 		}
 
+	}
+	public void sendHelp(TextChannel channel) {
+		EmbedBuilder helpbuilder = new EmbedBuilder();
+		helpbuilder.setAuthor("!editembed Command Help");
+		helpbuilder.setColor(Color.RED);
+		helpbuilder.setTitle("Unknown Usage");
+		helpbuilder.setDescription("USAGE >> !editembed <EmbedID> <EditAction> <Text/FieldID> [FieldAction] [Text]\nFor URLs we recommend https://imgur.com");
+		helpbuilder.addField("EditAction: setDescription", "!editembed <EmbedID> setDescription <Text>", false);
+		helpbuilder.addField("EditAction: setTitle", "!editembed <EmbedID> setTitle <Text>", false);
+		helpbuilder.addField("EditAction: setColor", "!editembed <EmbedID> setColor <Hex>", false);
+		helpbuilder.addField("EditAction: setAuthor", "!editembed <EmbedID> setAuthor <Text> <IconURL>", false);
+		helpbuilder.addField("EditAction: setThumbnail", "!editembed <EmbedID> setThumbnail <URL>", false);
+		helpbuilder.addField("EditAction: removeThumbnail", "!editembed <EmbedID> removeThumbnail ", false);
+		helpbuilder.addField("EditAction: setImage", "!editembed <EmbedID> setImage <URL>", false);
+		helpbuilder.addField("EditAction: removeImage", "!editembed <EmbedID> removeImage ", false);
+		helpbuilder.addField("EditAction: addField", "!editembed <EmbedID> addField <Title> ", false);
+		helpbuilder.addField("EditAction: editField", "!editembed <EmbedID> editField <FieldNumber> <FieldAction> <Text>", false);
+		helpbuilder.addField("FieldAction: setTitle", "!editembed <EmbedID> editField <FieldNumber> setTitle <Text>", true);
+		helpbuilder.addField("FieldAction: setDescription", "!editembed <EmbedID> editField <FieldNumber> setDescription <Text>", true);
+		helpbuilder.addField("FieldAction: setTitle", "!editembed <EmbedID> editField <FieldNumber> setInline <true/false>", true);
+		helpbuilder.addField("FieldAction: removeField", "!editembed <EmbedID> editField <FieldNumber> RemoveField", true);
+		helpbuilder.setFooter("- TomatenMaster Help", channel.getGuild().getIconUrl());
+		channel.sendMessage(helpbuilder.build()).complete().delete().queueAfter(5, TimeUnit.MINUTES);
 	}
 }

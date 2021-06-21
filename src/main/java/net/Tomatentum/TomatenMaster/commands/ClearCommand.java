@@ -19,8 +19,8 @@ public class ClearCommand implements GuildCommand {
 		msg.delete().queue();
 		if (member.hasPermission(channel, Permission.MESSAGE_MANAGE)) {
 			if (args.length == 2) {
-				List<Message> messages = getChannelHistory(channel, Integer.parseInt(args[1]));
-				int msgcount = messages.size();
+				List<Message> messages = getChannelHistory(channel, Integer.parseInt(args[1])+1);
+				int msgcount = messages.size()-1;
 				channel.purgeMessages(messages);
 				channel.sendMessage("```apache\nDeleted " + msgcount + " Messages\n```").complete().delete().queueAfter(10, TimeUnit.SECONDS);
 			}else {

@@ -38,6 +38,8 @@ public class DiscordBot {
 		buildbot.addEventListeners(new GuildListener(this));
 		buildbot.addEventListeners(new AutoModListener(this));
 		buildbot.addEventListeners(new ReactionRoleManager(this));
+		buildbot.addEventListeners(new ProtocolManager(this));
+
 		buildbot.enableIntents(GatewayIntent.GUILD_MEMBERS);
 		bot = buildbot.build();
 		bot.awaitReady();
