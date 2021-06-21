@@ -23,13 +23,16 @@ public class ProtocolManager extends ListenerAdapter {
 
 	public ProtocolManager(DiscordBot bot) {
 		this.bot = bot;
-		this.protocolChannel = bot.getBot().getTextChannelById(835092656836050964L);
 		builder = new EmbedBuilder();
 	}
 
 
 	@Override
 	public void onGuildMemberRoleAdd(@NotNull GuildMemberRoleAddEvent event) {
+		builder.clear();
+
+		this.protocolChannel = event.getGuild().getTextChannelById(835092656836050964L);
+
 		if (event.getUser().isBot()) { return; }
 		if (event.getRoles().equals(Collections.singletonList(event.getGuild().getRoleById(835091081837543435L)))) {return;}
 
@@ -43,15 +46,21 @@ public class ProtocolManager extends ListenerAdapter {
 		builder.setTimestamp(OffsetDateTime.now());
 		builder.setColor(Color.GREEN);
 		builder.setFooter(event.getGuild().getName(), event.getGuild().getIconUrl());
-		builder.setTitle(event.getMember().getAsMention() + "✍ has been updated!");
+		builder.setDescription(event.getMember().getAsMention() + "✍ has been updated!");
 		builder.addField("***Roles:***", stringBuilder.toString(), false);
 		builder.setThumbnail(event.getUser().getAvatarUrl());
 
 		protocolChannel.sendMessage(builder.build()).queue();
+		builder.clear();
+
 	}
 
 	@Override
 	public void onGuildMemberRoleRemove(@NotNull GuildMemberRoleRemoveEvent event) {
+		builder.clear();
+
+		this.protocolChannel = event.getGuild().getTextChannelById(835092656836050964L);
+
 		if (event.getUser().isBot()) { return; }
 
 		StringBuilder stringBuilder = new StringBuilder();
@@ -64,32 +73,46 @@ public class ProtocolManager extends ListenerAdapter {
 		builder.setTimestamp(OffsetDateTime.now());
 		builder.setColor(Color.RED);
 		builder.setFooter(event.getGuild().getName(), event.getGuild().getIconUrl());
-		builder.setTitle(event.getMember().getAsMention() + "✍ has been updated!");
+		builder.setDescription(event.getMember().getAsMention() + "✍ has been updated!");
 		builder.addField("***Roles:***", stringBuilder.toString(), false);
 		builder.setThumbnail(event.getUser().getAvatarUrl());
 		protocolChannel.sendMessage(builder.build()).queue();
+		builder.clear();
+
 
 	}
 
 	@Override
 	public void onGuildBan(@NotNull GuildBanEvent event) {
+		builder.clear();
+
+		this.protocolChannel = event.getGuild().getTextChannelById(835092656836050964L);
+
 
 		builder.setTimestamp(OffsetDateTime.now());
 		builder.setColor(Color.RED);
 		builder.setFooter(event.getGuild().getName(), event.getGuild().getIconUrl());
-		builder.setTitle(event.getUser().getAsMention() + "🛑 has been BANNED!");
+		builder.setDescription(event.getUser().getAsMention() + "🛑 has been BANNED!");
 		builder.setThumbnail(event.getUser().getAvatarUrl());
 		protocolChannel.sendMessage(builder.build()).queue();
+		builder.clear();
+
 	}
 
 	@Override
 	public void onGuildUnban(@NotNull GuildUnbanEvent event) {
+		builder.clear();
+
+		this.protocolChannel = event.getGuild().getTextChannelById(835092656836050964L);
+
 		builder.setTimestamp(OffsetDateTime.now());
 		builder.setColor(Color.GREEN);
 		builder.setFooter(event.getGuild().getName(), event.getGuild().getIconUrl());
-		builder.setTitle(event.getUser().getAsMention() + "⬆ has been unbanned!");
+		builder.setDescription(event.getUser().getAsMention() + "⬆ has been unbanned!");
 		builder.setThumbnail(event.getUser().getAvatarUrl());
 		protocolChannel.sendMessage(builder.build()).queue();
+		builder.clear();
+
 	}
 
 }

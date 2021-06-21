@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 
 import javax.security.auth.login.LoginException;
@@ -30,7 +31,7 @@ public class DiscordBot {
 
 	public DiscordBot() throws LoginException, InterruptedException {
 		config = new Config();
-		buildbot = JDABuilder.createDefault(config.getYML().getString("TOKEN"));
+		buildbot = JDABuilder.createDefault(config.getYML().getString("TOKEN"), GatewayIntent.GUILD_MEMBERS);
 		buildbot.setStatus(OnlineStatus.IDLE);
 		buildbot.addEventListeners(new CommandListener(this));
 		buildbot.addEventListeners(new VoiceListener(this));
@@ -40,6 +41,8 @@ public class DiscordBot {
 		buildbot.addEventListeners(new ReactionRoleManager(this));
 		buildbot.addEventListeners(new ProtocolManager(this));
 
+
+		buildbot.setMemberCachePolicy(MemberCachePolicy.ALL);
 		buildbot.enableIntents(GatewayIntent.GUILD_MEMBERS);
 		bot = buildbot.build();
 		bot.awaitReady();
