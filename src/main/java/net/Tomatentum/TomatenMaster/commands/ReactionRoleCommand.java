@@ -46,14 +46,14 @@ public class ReactionRoleCommand implements GuildCommand {
 					return;
 				}
 				if (args[1].equals("add")) {
-					bot.getReactionRole().addReactionRole(role, emoji, message);
+					bot.getReactionRole().addReactionRole(role, emoji, message, rchannel);
 					EmbedBuilder builder = new EmbedBuilder();
 					builder.setColor(Color.GREEN);
 					builder.setDescription("Added Emoji " + emoji + " with the Role " + role.getAsMention() + " on message: " + message.getIdLong());
 					channel.sendMessage(builder.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
 					builder.clear();
 				}else if (args[1].equals("remove")) {
-					bot.getReactionRole().removeReactionRole(message, emoji);
+					bot.getReactionRole().removeReactionRole(rchannel, message, emoji);
 					EmbedBuilder builder = new EmbedBuilder();
 					builder.setColor(Color.RED);
 					builder.setDescription("Removed Emoji " + emoji + " with the Role " + role.getAsMention() + " on message: " + message.getIdLong());

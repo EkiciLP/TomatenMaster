@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 
 import javax.security.auth.login.LoginException;
@@ -31,7 +32,7 @@ public class DiscordBot {
 
 	public DiscordBot() throws LoginException, InterruptedException {
 		config = new Config();
-		buildbot = JDABuilder.createDefault(config.getYML().getString("TOKEN"), GatewayIntent.GUILD_MEMBERS);
+		buildbot = JDABuilder.createDefault(config.getYML().getString("TOKEN"), GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES);
 		buildbot.setStatus(OnlineStatus.IDLE);
 		buildbot.addEventListeners(new CommandListener(this));
 		buildbot.addEventListeners(new VoiceListener(this));
@@ -43,7 +44,11 @@ public class DiscordBot {
 
 
 		buildbot.setMemberCachePolicy(MemberCachePolicy.ALL);
-		buildbot.enableIntents(GatewayIntent.GUILD_MEMBERS);
+		buildbot.enableIntents(GatewayIntent.GUILD_MESSAGE_REACTIONS);
+		buildbot.enableIntents(GatewayIntent.GUILD_MESSAGES);
+		buildbot.enableCache(CacheFlag.VOICE_STATE);
+
+
 		bot = buildbot.build();
 		bot.awaitReady();
 		System.out.println("[TomatenMaster] initialized");
@@ -55,6 +60,8 @@ public class DiscordBot {
 		warningManager = new WarningManager(this);
 		punishManager = new PunishManager(this);
 		reactionRole = new ReactionRoleManager(this);
+
+
 		cmdmanager.registerCommand("clear", new ClearCommand());
 		cmdmanager.registerCommand("panel",new PanelCommand(this));
 		cmdmanager.registerCommand("close", new CloseCommand(this));
@@ -74,6 +81,8 @@ public class DiscordBot {
 		cmdmanager.registerCommand("mute", new MuteCommand(this));
 		cmdmanager.registerCommand("ban", new BanCommand(this));
 		cmdmanager.registerCommand("rr", new ReactionRoleCommand(this));
+		cmdmanager.registerCommand("shutdown", new ShutDownCommand(this));
+
 		exitlistener();
 
 
