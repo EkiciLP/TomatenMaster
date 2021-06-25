@@ -43,6 +43,10 @@ public class HelpCommand implements GuildCommand {
 		builder.addField("!mute", "Muted the specified member!(unmutes if muted)\n!mute @member [time(minutes)]", false);
 		builder.addField("!ban", "Bans the specified member!(unbans if banned)\n!ban @member <time(minutes)> <reason>", false);
 		builder.addField("!rr", "ReactionRole Command. Usage: \"!rr <add/remove> #channel <messageID> <Emoji> @role\"", false);
+		builder.addField("!shutdown", "Shuts down the bot!", false);
+
+
+
 		privateChannel.sendTyping().queue();
 		privateChannel.sendMessage(builder.build()).queue();
 		builder.clear();

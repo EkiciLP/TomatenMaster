@@ -25,6 +25,11 @@ public class TicketManager {
 			Guild guild = bot.getBot().getGuildById(guildid);
 			TextChannel channel = guild.getTextChannelById(channelid);
 			Message msg = channel.retrieveMessageById(messageid).complete();
+
+			if (guild == null || channel == null || msg == null) {
+				return;
+			}
+
 			if (bot.getBot().getTextChannelById(channelid) != null) {
 				panel = bot.getBot().getTextChannelById(channelid).retrieveMessageById(messageid).complete();
 
