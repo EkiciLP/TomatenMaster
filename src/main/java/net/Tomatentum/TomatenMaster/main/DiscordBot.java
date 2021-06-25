@@ -29,8 +29,10 @@ public class DiscordBot {
 	private WarningManager warningManager;
 	private PunishManager punishManager;
 	private ReactionRoleManager reactionRole;
+	private static DiscordBot INSTANCE;
 
 	public DiscordBot() throws LoginException, InterruptedException {
+		INSTANCE = this;
 		config = new Config();
 		buildbot = JDABuilder.createDefault(config.getYML().getString("TOKEN"), GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES);
 		buildbot.setStatus(OnlineStatus.IDLE);
@@ -82,6 +84,9 @@ public class DiscordBot {
 		cmdmanager.registerCommand("ban", new BanCommand(this));
 		cmdmanager.registerCommand("rr", new ReactionRoleCommand(this));
 		cmdmanager.registerCommand("shutdown", new ShutDownCommand(this));
+		cmdmanager.registerCommand("suggest", new SuggestCommand());
+		cmdmanager.registerCommand("approve", new ApproveCommand());
+		cmdmanager.registerCommand("reject", new RejectCommand());
 
 		exitlistener();
 
@@ -145,5 +150,9 @@ public class DiscordBot {
 
 	public ReactionRoleManager getReactionRole() {
 		return reactionRole;
+	}
+
+	public static DiscordBot getINSTANCE() {
+		return INSTANCE;
 	}
 }
