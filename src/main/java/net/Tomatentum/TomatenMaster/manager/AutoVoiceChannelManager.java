@@ -59,7 +59,7 @@ public class AutoVoiceChannelManager {
 				}
 				tempChannels.removeAll(vcs);
 			}
-		}, 10000, 10000);
+		}, 50000, 30000);
 	}
 
 	//
