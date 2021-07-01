@@ -1,7 +1,6 @@
-package net.Tomatentum.TomatenMaster.manager;
+package net.Tomatentum.TomatenMaster.managers;
 
 import net.Tomatentum.TomatenMaster.main.DiscordBot;
-import net.Tomatentum.TomatenMaster.manager.TicketManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;

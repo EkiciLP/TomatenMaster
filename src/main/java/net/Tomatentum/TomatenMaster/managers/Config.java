@@ -1,4 +1,4 @@
-package net.Tomatentum.TomatenMaster.manager;
+package net.Tomatentum.TomatenMaster.managers;
 
 import org.bspfsystems.yamlconfiguration.file.YamlConfiguration;
 
