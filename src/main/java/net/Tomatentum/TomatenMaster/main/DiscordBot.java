@@ -1,11 +1,14 @@
 package net.Tomatentum.TomatenMaster.main;
 
-import net.Tomatentum.TomatenMaster.manager.TicketManager;
+import
+		net.Tomatentum.TomatenMaster.managers.TicketManager;
 import net.Tomatentum.TomatenMaster.commands.*;
 import net.Tomatentum.TomatenMaster.main.util.CommandManager;
 import net.Tomatentum.TomatenMaster.commands.EditEmbedCommand;
 import net.Tomatentum.TomatenMaster.listeners.*;
-import net.Tomatentum.TomatenMaster.manager.*;
+import net.Tomatentum.TomatenMaster.managers.*;
+import net.Tomatentum.TomatenMaster.music.AudioManager;
+import net.Tomatentum.TomatenMaster.music.commands.PlayCommand;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -30,6 +33,7 @@ public class DiscordBot {
 	private PunishManager punishManager;
 	private ReactionRoleManager reactionRole;
 	private static DiscordBot INSTANCE;
+	private AudioManager audioManager;
 
 	public DiscordBot() throws LoginException, InterruptedException {
 		INSTANCE = this;
@@ -62,7 +66,7 @@ public class DiscordBot {
 		warningManager = new WarningManager(this);
 		punishManager = new PunishManager(this);
 		reactionRole = new ReactionRoleManager(this);
-
+		audioManager = new AudioManager(this);
 
 		cmdmanager.registerCommand("clear", new ClearCommand());
 		cmdmanager.registerCommand("panel",new PanelCommand(this));
@@ -87,6 +91,7 @@ public class DiscordBot {
 		cmdmanager.registerCommand("suggest", new SuggestCommand());
 		cmdmanager.registerCommand("approve", new ApproveCommand());
 		cmdmanager.registerCommand("reject", new RejectCommand());
+		cmdmanager.registerCommand("play", new PlayCommand());
 
 		exitlistener();
 
@@ -105,12 +110,29 @@ public class DiscordBot {
 	public void exitlistener() {
 		Scanner scanner = new Scanner(System.in);
 		if (scanner.nextLine().equals("exit")) {
+
+			getAudioManager().getMusicManagers().forEach((guild, musicManager) ->
+					musicManager.getGuild().getAudioManager().closeAudioConnection()
+			);
+
 			bot.getPresence().setStatus(OnlineStatus.OFFLINE);
 			System.out.println("Bot offline");
 			bot.shutdown();
 			System.exit(0);
 
 		}
+	}
+
+	public String getTimestamp(long milliseconds)
+	{
+		int seconds = (int) (milliseconds / 1000) % 60 ;
+		int minutes = (int) ((milliseconds / (1000 * 60)) % 60);
+		int hours   = (int) ((milliseconds / (1000 * 60 * 60)) % 24);
+
+		if (hours > 0)
+			return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+		else
+			return String.format("%02d:%02d", minutes, seconds);
 	}
 
 	//getters/setters
@@ -154,5 +176,9 @@ public class DiscordBot {
 
 	public static DiscordBot getINSTANCE() {
 		return INSTANCE;
+	}
+
+	public AudioManager getAudioManager() {
+		return audioManager;
 	}
 }

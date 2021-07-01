@@ -1,4 +1,4 @@
-package net.Tomatentum.TomatenMaster.manager;
+package net.Tomatentum.TomatenMaster.managers;
 
 import net.Tomatentum.TomatenMaster.main.DiscordBot;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -63,6 +63,8 @@ public class Suggestion {
 		new Timer().schedule(new TimerTask() {
 			@Override
 			public void run() {
+				message = channel.retrieveMessageById(bot.getConfig().getYML().getLong("Suggestions." + ID + ".msgid")).complete();
+
 				int yescount = 0;
 				int nocount = 0;
 

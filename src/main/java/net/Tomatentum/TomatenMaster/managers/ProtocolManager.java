@@ -1,4 +1,4 @@
-package net.Tomatentum.TomatenMaster.manager;
+package net.Tomatentum.TomatenMaster.managers;
 
 import net.Tomatentum.TomatenMaster.main.DiscordBot;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -13,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.time.OffsetDateTime;
-import java.util.Arrays;
 import java.util.Collections;
 
 public class ProtocolManager extends ListenerAdapter {

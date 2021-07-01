@@ -2,7 +2,7 @@ package net.Tomatentum.TomatenMaster.commands;
 
 import net.Tomatentum.TomatenMaster.main.DiscordBot;
 import net.Tomatentum.TomatenMaster.main.util.GuildCommand;
-import net.Tomatentum.TomatenMaster.manager.Suggestion;
+import net.Tomatentum.TomatenMaster.managers.Suggestion;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;

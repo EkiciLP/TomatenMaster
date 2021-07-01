@@ -1,6 +1,5 @@
-package net.Tomatentum.TomatenMaster.manager;
+package net.Tomatentum.TomatenMaster.managers;
 
-import jdk.nashorn.internal.runtime.regexp.joni.Warnings;
 import net.Tomatentum.TomatenMaster.main.DiscordBot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;

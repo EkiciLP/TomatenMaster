@@ -62,9 +62,9 @@ public class EditEmbedCommand implements GuildCommand {
 							builder.setTitle(titleBuilder.toString());
 							msg.addReaction("✔").queue();
 							break;
+
 						case "setcolor":
-							String color = "0xFF";
-							builder.setColor(Integer.parseInt(color.replace("FF", args[3]), 16));
+							builder.setColor(Integer.parseInt(args[3].substring("#".length()), 16));
 							msg.addReaction("✔").queue();
 							break;
 						case "setauthor":
@@ -86,7 +86,7 @@ public class EditEmbedCommand implements GuildCommand {
 						case "removeimage":
 							builder.setImage(null);
 							break;
-						case "removeThumbnail":
+						case "removethumbnail":
 							builder.setThumbnail(null);
 							break;
 						case "editfield":
