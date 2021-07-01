@@ -14,11 +14,17 @@ import java.util.concurrent.TimeUnit;
 public class ApproveCommand implements GuildCommand {
 	@Override
 	public void onCommand(Member member, TextChannel channel, Message msg, String[] args) {
-		msg.delete().queue();
 		if (member.hasPermission(Permission.MESSAGE_MANAGE)) {
 			if (args.length == 2) {
 				try {
-					Suggestion.getSuggestionById(Integer.parseInt(args[1])).approve();
+					Suggestion suggestion = Suggestion.getSuggestionById(Integer.parseInt(args[1]));
+					if (suggestion != null) {
+						suggestion.approve();
+						msg.delete().queue();
+					}else {
+						msg.addReaction("❌").queue();
+						msg.delete().queueAfter(10, TimeUnit.SECONDS);
+					}
 				} catch (NumberFormatException e) {
 					EmbedBuilder builder = new EmbedBuilder();
 					builder.setColor(Color.RED).setTitle("Invalid args").setDescription("!approve SuggestionID");

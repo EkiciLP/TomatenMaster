@@ -17,7 +17,7 @@ public class TrackScheduler extends AudioEventAdapter {
 
 	private Queue<AudioTrack> queue;
 	private AudioPlayer player;
-	private AudioTrack currentTrack;
+	private String currentTrack;
 	private GuildMusicManager musicManager;
 	private boolean repeating = false;
 
@@ -25,26 +25,30 @@ public class TrackScheduler extends AudioEventAdapter {
 		this.musicManager = musicManager;
 		this.player = player;
 		this.queue = new LinkedBlockingQueue<>();
+		this.currentTrack = "- None -";
 	}
 
 	public void queue(AudioTrack track) {
-		if (currentTrack == null) {
+		if (currentTrack.equalsIgnoreCase("- None -")) {
 			player.playTrack(track);
-			currentTrack = track;
+			currentTrack = track.getInfo().title;
 		}else
 			queue.offer(track);
 	}
 	public void clear() {
 		queue.clear();
+		currentTrack = "- None -";
+		player.stopTrack();
 	}
 
-	public void skip() {
+	public AudioTrack skip() throws IllegalArgumentException{
 		if (queue.isEmpty()) {
 			throw new IllegalArgumentException("Queue is empty");
 		}else {
 			AudioTrack audioTrack = queue.poll();
 			player.playTrack(audioTrack);
-			currentTrack = audioTrack;
+			currentTrack = audioTrack.getInfo().title;
+			return audioTrack;
 		}
 	}
 
@@ -59,16 +63,16 @@ public class TrackScheduler extends AudioEventAdapter {
 			if (!queue.isEmpty()) {
 				AudioTrack audioTrack = queue.poll();
 				player.playTrack(audioTrack);
-				currentTrack = audioTrack;
+				currentTrack = audioTrack.getInfo().title;
 			}else {
 				musicManager.getGuild().getAudioManager().closeAudioConnection();
 				musicManager.getGuild().getAudioManager().setSendingHandler(null);
-				currentTrack = null;
+				currentTrack = "- None -";
 			}
 		}
 	}
 
-	public String getQueue() {
+	public String getQueueString() {
 		StringBuilder stringBuilder = new StringBuilder();
 		int count = 1;
 		for (AudioTrack track : queue) {
@@ -78,15 +82,20 @@ public class TrackScheduler extends AudioEventAdapter {
 		return stringBuilder.toString();
 	}
 
+
 	public void shuffle() {
 		Collections.shuffle((List<?>) queue);
 	}
 
-	public AudioTrack getCurrentTrack() {
+	public String getCurrentTrack() {
 		return currentTrack;
 	}
 
 	public boolean isRepeating() {
 		return repeating;
+	}
+
+	public void setRepeating(boolean repeating) {
+		this.repeating = repeating;
 	}
 }

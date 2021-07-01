@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.awt.*;
 
-public class PlayCommand implements GuildCommand {
+public class LeaveCommand implements GuildCommand {
 	private GuildMusicManager musicManager;
 
 	@Override
@@ -18,20 +18,23 @@ public class PlayCommand implements GuildCommand {
 		msg.delete().queue();
 		musicManager = DiscordBot.getINSTANCE().getAudioManager().getGuildMusicManager(channel.getGuild());
 		if (channel.getGuild().getAudioManager().isConnected() && !member.getVoiceState().getChannel().equals(channel.getGuild().getAudioManager().getConnectedChannel())) {
-			channel.sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Already conneced to channel: " + channel.getGuild().getAudioManager().getConnectedChannel().getName()).build()).queue();
+			channel.sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Bound to channel: " + channel.getGuild().getAudioManager().getConnectedChannel().getName()).build()).queue();
 			return;
 		}
-		if (args.length > 1) {
-			if (member.getVoiceState().inVoiceChannel()) {
-				StringBuilder stringBuilder = new StringBuilder();
-				for (int i = 1; i < args.length; i++) {
-					stringBuilder.append(args[i]).append(" ");
-				}
-				musicManager.connect(member.getVoiceState().getChannel());
-				musicManager.loadAndQueue(channel, stringBuilder.toString());
-			}
+		if (channel.getGuild().getAudioManager().isConnected()) {
+			musicManager.quit();
 
+			EmbedBuilder builder = new EmbedBuilder();
+			builder.setColor(Color.GREEN);
+			builder.setTitle("🚪 Left Channel");
+			channel.sendMessage(builder.build()).queue();
+			builder.clear();
+		}else {
+			EmbedBuilder builder = new EmbedBuilder();
+			builder.setColor(Color.RED);
+			builder.setTitle("❌ Not Connected to any VC");
+			channel.sendMessage(builder.build()).queue();
+			builder.clear();
 		}
-
 	}
 }

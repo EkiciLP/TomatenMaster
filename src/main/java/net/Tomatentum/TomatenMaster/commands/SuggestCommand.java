@@ -19,7 +19,6 @@ public class SuggestCommand implements GuildCommand {
 				return;
 			}
 		}
-		msg.delete().queue();
 		StringBuilder stringBuilder = new StringBuilder();
 
 		for (int i = 1; i < args.length; i++) {

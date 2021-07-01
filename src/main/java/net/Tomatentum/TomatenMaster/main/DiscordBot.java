@@ -8,7 +8,7 @@ import net.Tomatentum.TomatenMaster.commands.EditEmbedCommand;
 import net.Tomatentum.TomatenMaster.listeners.*;
 import net.Tomatentum.TomatenMaster.managers.*;
 import net.Tomatentum.TomatenMaster.music.AudioManager;
-import net.Tomatentum.TomatenMaster.music.commands.PlayCommand;
+import net.Tomatentum.TomatenMaster.music.commands.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -38,7 +38,7 @@ public class DiscordBot {
 	public DiscordBot() throws LoginException, InterruptedException {
 		INSTANCE = this;
 		config = new Config();
-		buildbot = JDABuilder.createDefault(config.getYML().getString("TOKEN"), GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_VOICE_STATES);
+		buildbot = JDABuilder.createDefault(config.getYML().getString("TOKEN"));
 		buildbot.setStatus(OnlineStatus.IDLE);
 		buildbot.addEventListeners(new CommandListener(this));
 		buildbot.addEventListeners(new VoiceListener(this));
@@ -52,6 +52,8 @@ public class DiscordBot {
 		buildbot.setMemberCachePolicy(MemberCachePolicy.ALL);
 		buildbot.enableIntents(GatewayIntent.GUILD_MESSAGE_REACTIONS);
 		buildbot.enableIntents(GatewayIntent.GUILD_MESSAGES);
+		buildbot.enableIntents(GatewayIntent.GUILD_MEMBERS);
+		buildbot.enableIntents(GatewayIntent.GUILD_VOICE_STATES);
 		buildbot.enableCache(CacheFlag.VOICE_STATE);
 
 
@@ -92,6 +94,13 @@ public class DiscordBot {
 		cmdmanager.registerCommand("approve", new ApproveCommand());
 		cmdmanager.registerCommand("reject", new RejectCommand());
 		cmdmanager.registerCommand("play", new PlayCommand());
+		cmdmanager.registerCommand("skip", new SkipCommand());
+		cmdmanager.registerCommand("clearqueue", new ClearQueueCommand());
+		cmdmanager.registerCommand("leave", new LeaveCommand());
+		cmdmanager.registerCommand("loop", new LoopCommand());
+		cmdmanager.registerCommand("shuffle", new ShuffleCommand());
+		cmdmanager.registerCommand("queue", new QueueCommand());
+		cmdmanager.registerCommand("volume", new VolumeCommand());
 
 		exitlistener();
 

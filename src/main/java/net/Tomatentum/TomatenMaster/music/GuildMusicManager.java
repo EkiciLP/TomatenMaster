@@ -22,6 +22,7 @@ public class GuildMusicManager {
 	private TrackScheduler trackScheduler;
 	private AudioPlayerSendHandler sendHandler;
 	private AudioPlayerManager playerManager;
+	private int DEFAULT_VOLUME = 35;
 
 
 	public GuildMusicManager(AudioPlayerManager playerManager, Guild guild) {
@@ -30,6 +31,7 @@ public class GuildMusicManager {
 		this.trackScheduler = new TrackScheduler(player, this);
 		this.playerManager = playerManager;
 		this.sendHandler = new AudioPlayerSendHandler(player);
+		player.setVolume(DEFAULT_VOLUME);
 
 		player.addListener(trackScheduler);
 	}
@@ -37,6 +39,11 @@ public class GuildMusicManager {
 	public void connect(VoiceChannel channel) {
 		this.guild.getAudioManager().openAudioConnection(channel);
 		this.guild.getAudioManager().setSendingHandler(sendHandler);
+	}
+	public void quit() {
+		guild.getAudioManager().closeAudioConnection();
+		guild.getAudioManager().setSendingHandler(null);
+		trackScheduler.clear();
 	}
 
 	public void loadAndQueue(TextChannel commandchannel, String URL) {
@@ -57,7 +64,8 @@ public class GuildMusicManager {
 				builder.setTitle("▶ Adding to Queue");
 				builder.setDescription(audioTrack.getInfo().title + " [" + DiscordBot.getINSTANCE().getTimestamp(audioTrack.getDuration()) + "]");
 				builder.setAuthor(audioTrack.getInfo().author);
-				builder.addField("Queue", trackScheduler.getQueue(), false);
+				builder.addField("Current Track", trackScheduler.getCurrentTrack(), false);
+				builder.addField("Queue", trackScheduler.getQueueString(), false);
 				commandchannel.sendMessage(builder.build()).queue();
 			}
 
@@ -67,7 +75,8 @@ public class GuildMusicManager {
 				builder.setColor(Color.GREEN);
 				builder.setTitle("▶ Added Playlist");
 				builder.setDescription(audioPlaylist.getName() + " [" + DiscordBot.getINSTANCE().getTimestamp(audioPlaylist.getTracks().size()) + "]");
-				builder.addField("Queue", trackScheduler.getQueue(), false);
+				builder.addField("Current Track", trackScheduler.getCurrentTrack(), false);
+				builder.addField("Queue", trackScheduler.getQueueString(), false);
 
 				commandchannel.sendMessage(builder.build()).queue();
 			}
@@ -82,7 +91,8 @@ public class GuildMusicManager {
 						builder.setTitle("▶ Adding to Queue");
 						builder.setDescription(audioTrack.getInfo().title + " [" + DiscordBot.getINSTANCE().getTimestamp(audioTrack.getDuration()) + "]");
 						builder.setAuthor(audioTrack.getInfo().author);
-						builder.addField("Queue", trackScheduler.getQueue(), false);
+						builder.addField("Current Track", trackScheduler.getCurrentTrack(), false);
+						builder.addField("Queue", trackScheduler.getQueueString(), false);
 						commandchannel.sendMessage(builder.build()).queue();
 					}
 
@@ -91,8 +101,9 @@ public class GuildMusicManager {
 						trackScheduler.queue(audioPlaylist.getTracks().get(0));
 						builder.setColor(Color.GREEN);
 						builder.setTitle("▶ Added to Queue");
-						builder.setDescription(audioPlaylist.getTracks().get(0) + " [" + DiscordBot.getINSTANCE().getTimestamp(audioPlaylist.getTracks().get(0).getDuration()) + "]");
-						builder.addField("Queue", trackScheduler.getQueue(), false);
+						builder.setDescription(audioPlaylist.getTracks().get(0).getInfo().title + " [" + DiscordBot.getINSTANCE().getTimestamp(audioPlaylist.getTracks().get(0).getDuration()) + "]");
+						builder.addField("Current Track", trackScheduler.getCurrentTrack(), false);
+						builder.addField("Queue", trackScheduler.getQueueString(), false);
 
 						commandchannel.sendMessage(builder.build()).queue();
 					}
@@ -102,7 +113,7 @@ public class GuildMusicManager {
 						builder.setColor(Color.RED);
 						builder.setTitle("🛑 No Match!");
 						builder.setDescription("Search: " + URL);
-						builder.addField("Queue", trackScheduler.getQueue(), false);
+						builder.addField("Queue", trackScheduler.getQueueString(), false);
 						commandchannel.sendMessage(builder.build()).queue();
 					}
 
@@ -111,7 +122,7 @@ public class GuildMusicManager {
 						builder.setColor(Color.RED);
 						builder.setTitle("🛑 Load Failed");
 						builder.setDescription("Search: " + URL + "\n" + e.getMessage());
-						builder.addField("Queue", trackScheduler.getQueue(), false);
+						builder.addField("Queue", trackScheduler.getQueueString(), false);
 						commandchannel.sendMessage(builder.build()).queue();
 					}
 				});
@@ -122,7 +133,7 @@ public class GuildMusicManager {
 				builder.setColor(Color.RED);
 				builder.setTitle("🛑 Load Failed");
 				builder.setDescription("Search: " + URL + "\n" + e.getMessage());
-				builder.addField("Queue", trackScheduler.getQueue(), false);
+				builder.addField("Queue", trackScheduler.getQueueString(), false);
 				commandchannel.sendMessage(builder.build()).queue();
 			}
 		});

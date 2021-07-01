@@ -10,9 +10,8 @@ import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.awt.*;
 
-public class PlayCommand implements GuildCommand {
+public class VolumeCommand implements GuildCommand {
 	private GuildMusicManager musicManager;
-
 	@Override
 	public void onCommand(Member member, TextChannel channel, Message msg, String[] args) {
 		msg.delete().queue();
@@ -21,17 +20,16 @@ public class PlayCommand implements GuildCommand {
 			channel.sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Already conneced to channel: " + channel.getGuild().getAudioManager().getConnectedChannel().getName()).build()).queue();
 			return;
 		}
-		if (args.length > 1) {
-			if (member.getVoiceState().inVoiceChannel()) {
-				StringBuilder stringBuilder = new StringBuilder();
-				for (int i = 1; i < args.length; i++) {
-					stringBuilder.append(args[i]).append(" ");
-				}
-				musicManager.connect(member.getVoiceState().getChannel());
-				musicManager.loadAndQueue(channel, stringBuilder.toString());
-			}
+		int newVolume = Math.max(10, Math.min(100, Integer.parseInt(args[1])));
+		int oldVolume = musicManager.getPlayer().getVolume();
+		musicManager.getPlayer().setVolume(newVolume);
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.setColor(Color.CYAN);
+		builder.setTitle("🔊 Volume Changed");
+		builder.setDescription("Volume Changed from "+ oldVolume + " to " + newVolume);
+		builder.setFooter("0 - 100");
+		channel.sendMessage(builder.build()).queue();
 
-		}
 
 	}
 }
