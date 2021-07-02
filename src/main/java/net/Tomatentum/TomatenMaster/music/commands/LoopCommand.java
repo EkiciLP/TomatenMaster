@@ -22,10 +22,10 @@ public class LoopCommand implements GuildCommand {
 		}
 		if (musicManager.getTrackScheduler().isRepeating()) {
 			musicManager.getTrackScheduler().setRepeating(false);
-			channel.sendMessage("🔂 Enabled").queue();
+			channel.sendMessage("🔂 Disabled").queue();
 		}else {
 			musicManager.getTrackScheduler().setRepeating(true);
-			channel.sendMessage("🔂 Disabled").queue();
+			channel.sendMessage("🔂 Enabled").queue();
 		}
 	}
 }

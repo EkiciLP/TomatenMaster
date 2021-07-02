@@ -47,9 +47,10 @@ public class TrackScheduler extends AudioEventAdapter {
 			queue.offer(track);
 	}
 	public void clear() {
+		player.stopTrack();
 		queue.clear();
 		currentTrack = null;
-		player.stopTrack();
+
 	}
 
 	public AudioTrack skip() throws IllegalArgumentException{
