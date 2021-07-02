@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import okhttp3.CookieJar;
 
 import java.awt.*;
 
@@ -17,20 +18,19 @@ public class SkipCommand implements GuildCommand {
 	public void onCommand(Member member, TextChannel channel, Message msg, String[] args) {
 		msg.delete().queue();
 		musicManager = DiscordBot.getINSTANCE().getAudioManager().getGuildMusicManager(channel.getGuild());
-		if (channel.getGuild().getAudioManager().isConnected() && !member.getVoiceState().getChannel().equals(channel.getGuild().getAudioManager().getConnectedChannel())) {
-			channel.sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Bound to Channel: " + channel.getGuild().getAudioManager().getConnectedChannel().getName()).build()).queue();
-			return;
+		if (member.getVoiceState().inVoiceChannel()) {
+			if (!musicManager.isPermitted(member.getVoiceState().getChannel(), channel)) {
+				return;
+			}
+
+
 		}
-		EmbedBuilder builder = new EmbedBuilder();
 		try {
 			AudioTrack track = musicManager.getTrackScheduler().skip();
-			builder.setColor(Color.GREEN);
-			builder.setDescription("Skipped to track: " + track.getInfo().title + " [" + DiscordBot.getINSTANCE().getTimestamp(track.getDuration()) + "]");
+			channel.sendMessage("Skipped! ```" + track.getInfo().title + "```").queue();
 		}catch (IllegalArgumentException e) {
-			builder.setColor(Color.RED);
-			builder.setDescription("Queue is Empty");
+			channel.sendMessage("🛑 Queue Empty").queue();
 		}
-		channel.sendMessage(builder.build()).queue();
 
 	}
 }

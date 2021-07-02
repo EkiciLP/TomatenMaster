@@ -17,21 +17,22 @@ public class PlayCommand implements GuildCommand {
 	public void onCommand(Member member, TextChannel channel, Message msg, String[] args) {
 		msg.delete().queue();
 		musicManager = DiscordBot.getINSTANCE().getAudioManager().getGuildMusicManager(channel.getGuild());
-		if (channel.getGuild().getAudioManager().isConnected() && !member.getVoiceState().getChannel().equals(channel.getGuild().getAudioManager().getConnectedChannel())) {
-			channel.sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Already conneced to channel: " + channel.getGuild().getAudioManager().getConnectedChannel().getName()).build()).queue();
-			return;
+		if (member.getVoiceState().inVoiceChannel()) {
+			if (!musicManager.isPermitted(member.getVoiceState().getChannel(), channel))
+				return;
 		}
+
+
 		if (args.length > 1) {
 			if (member.getVoiceState().inVoiceChannel()) {
 				StringBuilder stringBuilder = new StringBuilder();
 				for (int i = 1; i < args.length; i++) {
 					stringBuilder.append(args[i]).append(" ");
 				}
-				musicManager.connect(member.getVoiceState().getChannel());
+
+				musicManager.connect(member.getVoiceState().getChannel(), channel);
 				musicManager.loadAndQueue(channel, stringBuilder.toString());
 			}
-
 		}
-
 	}
 }

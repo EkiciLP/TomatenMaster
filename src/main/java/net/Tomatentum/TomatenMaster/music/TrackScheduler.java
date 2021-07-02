@@ -8,16 +8,18 @@ import net.Tomatentum.TomatenMaster.main.DiscordBot;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class TrackScheduler extends AudioEventAdapter {
 
-	private Queue<AudioTrack> queue;
+	private BlockingQueue<AudioTrack> queue;
 	private AudioPlayer player;
-	private String currentTrack;
+	private AudioTrack currentTrack;
 	private GuildMusicManager musicManager;
 	private boolean repeating = false;
 
@@ -25,19 +27,19 @@ public class TrackScheduler extends AudioEventAdapter {
 		this.musicManager = musicManager;
 		this.player = player;
 		this.queue = new LinkedBlockingQueue<>();
-		this.currentTrack = "- None -";
+		this.currentTrack = null;
 	}
 
 	public void queue(AudioTrack track) {
-		if (currentTrack.equalsIgnoreCase("- None -")) {
+		if (currentTrack == null) {
 			player.playTrack(track);
-			currentTrack = track.getInfo().title;
+			currentTrack = track;
 		}else
 			queue.offer(track);
 	}
 	public void clear() {
 		queue.clear();
-		currentTrack = "- None -";
+		currentTrack = null;
 		player.stopTrack();
 	}
 
@@ -47,7 +49,7 @@ public class TrackScheduler extends AudioEventAdapter {
 		}else {
 			AudioTrack audioTrack = queue.poll();
 			player.playTrack(audioTrack);
-			currentTrack = audioTrack.getInfo().title;
+			currentTrack = audioTrack;
 			return audioTrack;
 		}
 	}
@@ -63,11 +65,11 @@ public class TrackScheduler extends AudioEventAdapter {
 			if (!queue.isEmpty()) {
 				AudioTrack audioTrack = queue.poll();
 				player.playTrack(audioTrack);
-				currentTrack = audioTrack.getInfo().title;
+				currentTrack = audioTrack;
 			}else {
 				musicManager.getGuild().getAudioManager().closeAudioConnection();
 				musicManager.getGuild().getAudioManager().setSendingHandler(null);
-				currentTrack = "- None -";
+				currentTrack = null;
 			}
 		}
 	}
@@ -76,7 +78,7 @@ public class TrackScheduler extends AudioEventAdapter {
 		StringBuilder stringBuilder = new StringBuilder();
 		int count = 1;
 		for (AudioTrack track : queue) {
-			stringBuilder.append(count).append(": ").append(track.getInfo().title).append(" [").append(DiscordBot.getINSTANCE().getTimestamp(track.getDuration())).append("]\n");
+			stringBuilder.append(count).append(": ").append(track.getInfo().title).append(" [").append(DiscordBot.getTimestamp(track.getDuration())).append("]\n");
 			count++;
 		}
 		return stringBuilder.toString();
@@ -84,10 +86,13 @@ public class TrackScheduler extends AudioEventAdapter {
 
 
 	public void shuffle() {
-		Collections.shuffle((List<?>) queue);
+		List<AudioTrack> audioTrackList = new ArrayList<>(queue);
+		Collections.shuffle(audioTrackList);
+		this.queue = new LinkedBlockingQueue<>(audioTrackList);
+
 	}
 
-	public String getCurrentTrack() {
+	public AudioTrack getCurrentTrack() {
 		return currentTrack;
 	}
 
@@ -97,5 +102,8 @@ public class TrackScheduler extends AudioEventAdapter {
 
 	public void setRepeating(boolean repeating) {
 		this.repeating = repeating;
+	}
+	public boolean isEmpty() {
+		return queue.isEmpty();
 	}
 }

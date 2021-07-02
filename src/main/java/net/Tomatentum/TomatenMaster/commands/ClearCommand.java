@@ -15,14 +15,13 @@ import java.util.concurrent.TimeUnit;
 public class ClearCommand implements GuildCommand {
 	@Override
 	public void onCommand(Member member, TextChannel channel, Message msg, String[] args) {
-		channel.sendTyping().complete();
 		msg.delete().queue();
 		if (member.hasPermission(channel, Permission.MESSAGE_MANAGE)) {
 			if (args.length == 2) {
 				List<Message> messages = getChannelHistory(channel, Integer.parseInt(args[1])+1);
 				int msgcount = messages.size()-1;
 				channel.purgeMessages(messages);
-				channel.sendMessage("```apache\nDeleted " + msgcount + " Messages\n```").complete().delete().queueAfter(10, TimeUnit.SECONDS);
+				channel.sendMessage("```\nDeleted " + msgcount + " Messages\n```").complete().delete().queueAfter(10, TimeUnit.SECONDS);
 			}else {
 				EmbedBuilder builder = new EmbedBuilder();
 				builder.setColor(0xfc0303);

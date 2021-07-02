@@ -16,12 +16,13 @@ public class ShuffleCommand implements GuildCommand {
 	@Override
 	public void onCommand(Member member, TextChannel channel, Message msg, String[] args) {
 		musicManager = DiscordBot.getINSTANCE().getAudioManager().getGuildMusicManager(channel.getGuild());
-		if (channel.getGuild().getAudioManager().isConnected() && !member.getVoiceState().getChannel().equals(channel.getGuild().getAudioManager().getConnectedChannel())) {
-			channel.sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Bound to channel: " + channel.getGuild().getAudioManager().getConnectedChannel().getName()).build()).queue();
-			return;
+		if (member.getVoiceState().inVoiceChannel()) {
+			if (!musicManager.isPermitted(member.getVoiceState().getChannel(), channel)) {
+				return;
+			}
 		}
 
 		musicManager.getTrackScheduler().shuffle();
-		channel.sendMessage(new EmbedBuilder().setColor(Color.GREEN).setTitle("🔀 Shuffled Queue").build()).queue();
+		channel.sendMessage("🔀 Shuffled Queue").queue();
 	}
 }

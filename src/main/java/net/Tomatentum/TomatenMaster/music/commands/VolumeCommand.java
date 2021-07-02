@@ -16,20 +16,17 @@ public class VolumeCommand implements GuildCommand {
 	public void onCommand(Member member, TextChannel channel, Message msg, String[] args) {
 		msg.delete().queue();
 		musicManager = DiscordBot.getINSTANCE().getAudioManager().getGuildMusicManager(channel.getGuild());
-		if (channel.getGuild().getAudioManager().isConnected() && !member.getVoiceState().getChannel().equals(channel.getGuild().getAudioManager().getConnectedChannel())) {
-			channel.sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Already conneced to channel: " + channel.getGuild().getAudioManager().getConnectedChannel().getName()).build()).queue();
-			return;
+		if (member.getVoiceState().inVoiceChannel()) {
+			if (!musicManager.isPermitted(member.getVoiceState().getChannel(), channel)) {
+				return;
+			}
 		}
+
 		int newVolume = Math.max(10, Math.min(100, Integer.parseInt(args[1])));
 		int oldVolume = musicManager.getPlayer().getVolume();
 		musicManager.getPlayer().setVolume(newVolume);
-		EmbedBuilder builder = new EmbedBuilder();
-		builder.setColor(Color.CYAN);
-		builder.setTitle("🔊 Volume Changed");
-		builder.setDescription("Volume Changed from "+ oldVolume + " to " + newVolume);
-		builder.setFooter("0 - 100");
-		channel.sendMessage(builder.build()).queue();
 
+		channel.sendMessage("🔊 Volume Changed from "+ oldVolume + " to " + newVolume).queue();
 
 	}
 }

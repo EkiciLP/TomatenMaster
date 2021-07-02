@@ -10,22 +10,26 @@ import net.dv8tion.jda.api.entities.TextChannel;
 
 import java.awt.*;
 
-public class LoopCommand implements GuildCommand {
+public class StopCommand implements GuildCommand {
 	private GuildMusicManager musicManager;
+
 	@Override
 	public void onCommand(Member member, TextChannel channel, Message msg, String[] args) {
+		msg.delete().queue();
 		musicManager = DiscordBot.getINSTANCE().getAudioManager().getGuildMusicManager(channel.getGuild());
+
 		if (member.getVoiceState().inVoiceChannel()) {
 			if (!musicManager.isPermitted(member.getVoiceState().getChannel(), channel)) {
 				return;
 			}
 		}
-		if (musicManager.getTrackScheduler().isRepeating()) {
-			musicManager.getTrackScheduler().setRepeating(false);
-			channel.sendMessage("🔂 Enabled").queue();
+
+
+		if (channel.getGuild().getAudioManager().isConnected()) {
+			musicManager.quit();
+			channel.sendMessage("⏹ Player stopped").queue();
 		}else {
-			musicManager.getTrackScheduler().setRepeating(true);
-			channel.sendMessage("🔂 Disabled").queue();
+			channel.sendMessage("❌ Not Connected to any VC");
 		}
 	}
 }

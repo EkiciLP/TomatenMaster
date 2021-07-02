@@ -16,15 +16,12 @@ public class ClearQueueCommand implements GuildCommand {
 	public void onCommand(Member member, TextChannel channel, Message msg, String[] args) {
 		msg.delete().queue();
 		musicManager = DiscordBot.getINSTANCE().getAudioManager().getGuildMusicManager(channel.getGuild());
-		if (channel.getGuild().getAudioManager().isConnected() && !member.getVoiceState().getChannel().equals(channel.getGuild().getAudioManager().getConnectedChannel())) {
-			channel.sendMessage(new EmbedBuilder().setColor(Color.RED).setDescription("Bound to Channel: " + channel.getGuild().getAudioManager().getConnectedChannel().getName()).build()).queue();
-			return;
+		if (member.getVoiceState().inVoiceChannel()) {
+			if (!musicManager.isPermitted(member.getVoiceState().getChannel(), channel)) {
+				return;
+			}
 		}
-
 		musicManager.getTrackScheduler().clear();
-		EmbedBuilder builder = new EmbedBuilder();
-		builder.setColor(Color.GREEN);
-		builder.setDescription("🚫 Queue cleared!");
-		channel.sendMessage(builder.build()).queue();
+		channel.sendMessage("⛔ Queue cleared!").queue();
 	}
 }

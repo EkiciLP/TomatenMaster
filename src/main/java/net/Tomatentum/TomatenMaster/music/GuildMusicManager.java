@@ -10,10 +10,13 @@ import net.Tomatentum.TomatenMaster.main.DiscordBot;
 import net.Tomatentum.TomatenMaster.music.TrackScheduler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 
 import java.awt.*;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GuildMusicManager {
 
@@ -23,6 +26,7 @@ public class GuildMusicManager {
 	private AudioPlayerSendHandler sendHandler;
 	private AudioPlayerManager playerManager;
 	private int DEFAULT_VOLUME = 35;
+	private TextChannel currentTextChannel;
 
 
 	public GuildMusicManager(AudioPlayerManager playerManager, Guild guild) {
@@ -34,16 +38,37 @@ public class GuildMusicManager {
 		player.setVolume(DEFAULT_VOLUME);
 
 		player.addListener(trackScheduler);
+
+		startCleanupLoop(20000);
 	}
 
-	public void connect(VoiceChannel channel) {
+	public void connect(VoiceChannel channel, TextChannel commandChannel) {
+		if (!guild.getAudioManager().isConnected())
+			commandChannel.sendMessage("🔗 Connected to ```" + channel.getName() + "``` and bound to " + commandChannel.getAsMention()).queue();
+
 		this.guild.getAudioManager().openAudioConnection(channel);
 		this.guild.getAudioManager().setSendingHandler(sendHandler);
+		this.currentTextChannel = commandChannel;
 	}
 	public void quit() {
 		guild.getAudioManager().closeAudioConnection();
 		guild.getAudioManager().setSendingHandler(null);
 		trackScheduler.clear();
+		currentTextChannel = null;
+	}
+
+
+
+	public boolean isPermitted(VoiceChannel vc, TextChannel tc) {
+		if (guild.getAudioManager().isConnected()) {
+			if (tc.equals(currentTextChannel) && vc.equals(guild.getAudioManager().getConnectedChannel())) {
+				return true;
+			}else {
+				tc.sendMessage("Bot bound to ```" + guild.getAudioManager().getConnectedChannel().getName() + "``` and to " + currentTextChannel.getAsMention()).queue();
+				return false;
+			}
+		}else
+			return true;
 	}
 
 	public void loadAndQueue(TextChannel commandchannel, String URL) {
@@ -52,33 +77,28 @@ public class GuildMusicManager {
 			trackURL = URL.substring(1, URL.length()-1);
 		}else
 			trackURL = URL;
-		EmbedBuilder builder = new EmbedBuilder();
-		builder.setFooter(guild.getName(), guild.getIconUrl());
-
-
+		commandchannel.sendMessage("🔎 Searching: " + trackURL).queue();
 		this.playerManager.loadItem(trackURL, new AudioLoadResultHandler() {
 			@Override
 			public void trackLoaded(AudioTrack audioTrack) {
+				if (trackScheduler.isEmpty()) {
+					commandchannel.sendMessage("▶ Now Playing ``" + audioTrack.getInfo().title + "``").queue();
+				}else
+					commandchannel.sendMessage("▶ Added to Queue: ``" + audioTrack.getInfo().title + "``").queue();
+
+
 				trackScheduler.queue(audioTrack);
-				builder.setColor(Color.GREEN);
-				builder.setTitle("▶ Adding to Queue");
-				builder.setDescription(audioTrack.getInfo().title + " [" + DiscordBot.getINSTANCE().getTimestamp(audioTrack.getDuration()) + "]");
-				builder.setAuthor(audioTrack.getInfo().author);
-				builder.addField("Current Track", trackScheduler.getCurrentTrack(), false);
-				builder.addField("Queue", trackScheduler.getQueueString(), false);
-				commandchannel.sendMessage(builder.build()).queue();
 			}
 
 			@Override
 			public void playlistLoaded(AudioPlaylist audioPlaylist) {
-				audioPlaylist.getTracks().forEach(trackScheduler::queue);
-				builder.setColor(Color.GREEN);
-				builder.setTitle("▶ Added Playlist");
-				builder.setDescription(audioPlaylist.getName() + " [" + DiscordBot.getINSTANCE().getTimestamp(audioPlaylist.getTracks().size()) + "]");
-				builder.addField("Current Track", trackScheduler.getCurrentTrack(), false);
-				builder.addField("Queue", trackScheduler.getQueueString(), false);
+				if (trackScheduler.isEmpty()) {
+					commandchannel.sendMessage("▶ Now Playing Playlist: ``" + audioPlaylist.getName() + "``").queue();
+				}else
+					commandchannel.sendMessage("▶ Playlist added to Queue: ``" + audioPlaylist.getName() + "``").queue();
 
-				commandchannel.sendMessage(builder.build()).queue();
+				audioPlaylist.getTracks().forEach(trackScheduler::queue);
+
 			}
 
 			@Override
@@ -86,61 +106,62 @@ public class GuildMusicManager {
 				playerManager.loadItem("ytsearch:" + trackURL, new AudioLoadResultHandler() {
 					@Override
 					public void trackLoaded(AudioTrack audioTrack) {
+						if (trackScheduler.isEmpty()) {
+							commandchannel.sendMessage("▶ Now Playing ``" + audioTrack.getInfo().title + "``").queue();
+						}else
+							commandchannel.sendMessage("▶ Added to Queue: ``" + audioTrack.getInfo().title + "``").queue();
+
+
 						trackScheduler.queue(audioTrack);
-						builder.setColor(Color.GREEN);
-						builder.setTitle("▶ Adding to Queue");
-						builder.setDescription(audioTrack.getInfo().title + " [" + DiscordBot.getINSTANCE().getTimestamp(audioTrack.getDuration()) + "]");
-						builder.setAuthor(audioTrack.getInfo().author);
-						builder.addField("Current Track", trackScheduler.getCurrentTrack(), false);
-						builder.addField("Queue", trackScheduler.getQueueString(), false);
-						commandchannel.sendMessage(builder.build()).queue();
+
 					}
 
 					@Override
 					public void playlistLoaded(AudioPlaylist audioPlaylist) {
-						trackScheduler.queue(audioPlaylist.getTracks().get(0));
-						builder.setColor(Color.GREEN);
-						builder.setTitle("▶ Added to Queue");
-						builder.setDescription(audioPlaylist.getTracks().get(0).getInfo().title + " [" + DiscordBot.getINSTANCE().getTimestamp(audioPlaylist.getTracks().get(0).getDuration()) + "]");
-						builder.addField("Current Track", trackScheduler.getCurrentTrack(), false);
-						builder.addField("Queue", trackScheduler.getQueueString(), false);
+						AudioTrack track = audioPlaylist.getTracks().get(0);
+						if (trackScheduler.isEmpty()) {
+							commandchannel.sendMessage("▶ Now Playing: ``" + audioPlaylist.getTracks().get(0).getInfo().title + "``").queue();
+						}else
+							commandchannel.sendMessage("▶ Added to Queue: ``" + audioPlaylist.getTracks().get(0).getInfo().title + "``").queue();
 
-						commandchannel.sendMessage(builder.build()).queue();
+
+
+
+						trackScheduler.queue(track);
 					}
 
 					@Override
 					public void noMatches() {
-						builder.setColor(Color.RED);
-						builder.setTitle("🛑 No Match!");
-						builder.setDescription("Search: " + URL);
-						builder.addField("Queue", trackScheduler.getQueueString(), false);
-						commandchannel.sendMessage(builder.build()).queue();
+						commandchannel.sendMessage("🛑 No Matches for: ```" + trackURL + "```").queue();
 					}
 
 					@Override
 					public void loadFailed(FriendlyException e) {
-						builder.setColor(Color.RED);
-						builder.setTitle("🛑 Load Failed");
-						builder.setDescription("Search: " + URL + "\n" + e.getMessage());
-						builder.addField("Queue", trackScheduler.getQueueString(), false);
-						commandchannel.sendMessage(builder.build()).queue();
+						commandchannel.sendMessage("```" + e.getMessage() + "```").queue();
 					}
 				});
 			}
 
 			@Override
 			public void loadFailed(FriendlyException e) {
-				builder.setColor(Color.RED);
-				builder.setTitle("🛑 Load Failed");
-				builder.setDescription("Search: " + URL + "\n" + e.getMessage());
-				builder.addField("Queue", trackScheduler.getQueueString(), false);
-				commandchannel.sendMessage(builder.build()).queue();
+				commandchannel.sendMessage("```" + e.getMessage() + "```").queue();
 			}
 		});
 
 	}
 
-
+	public void startCleanupLoop(long delaymillis) {
+		new Timer().schedule(new TimerTask() {
+			@Override
+			public void run() {
+				if (guild.getAudioManager().isConnected()) {
+					if (guild.getAudioManager().getConnectedChannel().getMembers().size() < 2) {
+						quit();
+					}
+				}
+			}
+		}, delaymillis, delaymillis);
+	}
 
 
 

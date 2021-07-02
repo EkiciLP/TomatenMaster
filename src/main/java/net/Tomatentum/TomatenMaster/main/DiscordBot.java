@@ -96,11 +96,13 @@ public class DiscordBot {
 		cmdmanager.registerCommand("play", new PlayCommand());
 		cmdmanager.registerCommand("skip", new SkipCommand());
 		cmdmanager.registerCommand("clearqueue", new ClearQueueCommand());
-		cmdmanager.registerCommand("leave", new LeaveCommand());
+		cmdmanager.registerCommand("stop", new StopCommand());
 		cmdmanager.registerCommand("loop", new LoopCommand());
 		cmdmanager.registerCommand("shuffle", new ShuffleCommand());
 		cmdmanager.registerCommand("queue", new QueueCommand());
 		cmdmanager.registerCommand("volume", new VolumeCommand());
+		cmdmanager.registerCommand("pause", new PauseCommand());
+		cmdmanager.registerCommand("resume", new PauseCommand());
 
 		exitlistener();
 
@@ -132,7 +134,7 @@ public class DiscordBot {
 		}
 	}
 
-	public String getTimestamp(long milliseconds)
+	public static String getTimestamp(long milliseconds)
 	{
 		int seconds = (int) (milliseconds / 1000) % 60 ;
 		int minutes = (int) ((milliseconds / (1000 * 60)) % 60);
