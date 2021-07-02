@@ -15,7 +15,6 @@ public class PlayCommand implements GuildCommand {
 
 	@Override
 	public void onCommand(Member member, TextChannel channel, Message msg, String[] args) {
-		msg.delete().queue();
 		musicManager = DiscordBot.getINSTANCE().getAudioManager().getGuildMusicManager(channel.getGuild());
 		if (member.getVoiceState().inVoiceChannel()) {
 			if (!musicManager.isPermitted(member.getVoiceState().getChannel(), channel))

@@ -44,7 +44,7 @@ public class GuildMusicManager {
 
 	public void connect(VoiceChannel channel, TextChannel commandChannel) {
 		if (!guild.getAudioManager().isConnected())
-			commandChannel.sendMessage("🔗 Connected to ```" + channel.getName() + "``` and bound to " + commandChannel.getAsMention()).queue();
+			commandChannel.sendMessage("🔗 Connected to ``" + channel.getName() + "`` and bound to " + commandChannel.getAsMention()).queue();
 
 		this.guild.getAudioManager().openAudioConnection(channel);
 		this.guild.getAudioManager().setSendingHandler(sendHandler);
@@ -81,23 +81,23 @@ public class GuildMusicManager {
 		this.playerManager.loadItem(trackURL, new AudioLoadResultHandler() {
 			@Override
 			public void trackLoaded(AudioTrack audioTrack) {
+				trackScheduler.queue(audioTrack);
 				if (trackScheduler.isEmpty()) {
 					commandchannel.sendMessage("▶ Now Playing ``" + audioTrack.getInfo().title + "``").queue();
 				}else
 					commandchannel.sendMessage("▶ Added to Queue: ``" + audioTrack.getInfo().title + "``").queue();
 
-
-				trackScheduler.queue(audioTrack);
 			}
 
 			@Override
 			public void playlistLoaded(AudioPlaylist audioPlaylist) {
+				audioPlaylist.getTracks().forEach(trackScheduler::queue);
+
 				if (trackScheduler.isEmpty()) {
 					commandchannel.sendMessage("▶ Now Playing Playlist: ``" + audioPlaylist.getName() + "``").queue();
 				}else
 					commandchannel.sendMessage("▶ Playlist added to Queue: ``" + audioPlaylist.getName() + "``").queue();
 
-				audioPlaylist.getTracks().forEach(trackScheduler::queue);
 
 			}
 
@@ -106,28 +106,25 @@ public class GuildMusicManager {
 				playerManager.loadItem("ytsearch:" + trackURL, new AudioLoadResultHandler() {
 					@Override
 					public void trackLoaded(AudioTrack audioTrack) {
+						trackScheduler.queue(audioTrack);
+
 						if (trackScheduler.isEmpty()) {
 							commandchannel.sendMessage("▶ Now Playing ``" + audioTrack.getInfo().title + "``").queue();
 						}else
 							commandchannel.sendMessage("▶ Added to Queue: ``" + audioTrack.getInfo().title + "``").queue();
 
 
-						trackScheduler.queue(audioTrack);
-
 					}
 
 					@Override
 					public void playlistLoaded(AudioPlaylist audioPlaylist) {
 						AudioTrack track = audioPlaylist.getTracks().get(0);
+						trackScheduler.queue(track);
 						if (trackScheduler.isEmpty()) {
 							commandchannel.sendMessage("▶ Now Playing: ``" + audioPlaylist.getTracks().get(0).getInfo().title + "``").queue();
 						}else
 							commandchannel.sendMessage("▶ Added to Queue: ``" + audioPlaylist.getTracks().get(0).getInfo().title + "``").queue();
 
-
-
-
-						trackScheduler.queue(track);
 					}
 
 					@Override
@@ -137,14 +134,15 @@ public class GuildMusicManager {
 
 					@Override
 					public void loadFailed(FriendlyException e) {
-						commandchannel.sendMessage("```" + e.getMessage() + "```").queue();
+						commandchannel.sendMessage("```" + e.getMessage() + " || " + e.severity.toString() + "```").queue();
+
 					}
 				});
 			}
 
 			@Override
 			public void loadFailed(FriendlyException e) {
-				commandchannel.sendMessage("```" + e.getMessage() + "```").queue();
+				commandchannel.sendMessage("```" + e.getMessage() + " || " + e.severity.toString() + "```").queue();
 			}
 		});
 

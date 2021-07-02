@@ -27,7 +27,7 @@ public class SkipCommand implements GuildCommand {
 		}
 		try {
 			AudioTrack track = musicManager.getTrackScheduler().skip();
-			channel.sendMessage("Skipped! ```" + track.getInfo().title + "```").queue();
+			channel.sendMessage("Skipped! ``" + track.getInfo().title + "``").queue();
 		}catch (IllegalArgumentException e) {
 			channel.sendMessage("🛑 Queue Empty").queue();
 		}

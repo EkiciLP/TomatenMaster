@@ -5,13 +5,11 @@ import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import net.Tomatentum.TomatenMaster.main.DiscordBot;
+import net.dv8tion.jda.api.entities.Activity;
 
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -28,6 +26,17 @@ public class TrackScheduler extends AudioEventAdapter {
 		this.player = player;
 		this.queue = new LinkedBlockingQueue<>();
 		this.currentTrack = null;
+
+		new Timer().schedule(new TimerTask() {
+			@Override
+			public void run() {
+				if (currentTrack != null) {
+					String track = player.getPlayingTrack().getInfo().title + " [" + DiscordBot.getTimestamp(player.getPlayingTrack().getPosition()) + "/" + DiscordBot.getTimestamp(player.getPlayingTrack().getDuration()) + "]";
+					DiscordBot.getINSTANCE().getBot().getPresence().setActivity(Activity.playing(track));
+				}else
+					DiscordBot.getINSTANCE().getBot().getPresence().setActivity(null);
+			}
+		}, 6000, 6000);
 	}
 
 	public void queue(AudioTrack track) {
@@ -89,8 +98,8 @@ public class TrackScheduler extends AudioEventAdapter {
 		List<AudioTrack> audioTrackList = new ArrayList<>(queue);
 		Collections.shuffle(audioTrackList);
 		this.queue = new LinkedBlockingQueue<>(audioTrackList);
-
 	}
+
 
 	public AudioTrack getCurrentTrack() {
 		return currentTrack;

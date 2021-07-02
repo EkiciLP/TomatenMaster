@@ -28,7 +28,6 @@ public class DiscordBot {
 	private TicketManager ticketManager;
 	private Config config;
 	private EmbedManager embedManager;
-	private PresenceManager presenceManager;
 	private WarningManager warningManager;
 	private PunishManager punishManager;
 	private ReactionRoleManager reactionRole;
@@ -64,7 +63,6 @@ public class DiscordBot {
 		autoVoiceChannelManager = new AutoVoiceChannelManager(this);
 		ticketManager = new TicketManager(this);
 		embedManager = new EmbedManager(this);
-		presenceManager = new PresenceManager(this);
 		warningManager = new WarningManager(this);
 		punishManager = new PunishManager(this);
 		reactionRole = new ReactionRoleManager(this);
@@ -192,4 +190,5 @@ public class DiscordBot {
 	public AudioManager getAudioManager() {
 		return audioManager;
 	}
+
 }
