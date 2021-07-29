@@ -93,34 +93,40 @@ public class EditEmbedCommand implements GuildCommand {
 							if (args.length >= 5) {
 								if (args[4].equalsIgnoreCase("removefield") || args[4].equalsIgnoreCase("settitle") || args[4].equalsIgnoreCase("setdescription") || args[4].equalsIgnoreCase("setinline")) {
 									List<MessageEmbed.Field> fieldlist = new ArrayList<>(builder.getFields());
+
+
 									if (fieldlist.get(Integer.parseInt(args[3]) - 1) != null) {
+
+
+
 										MessageEmbed.Field oldfield = fieldlist.get(Integer.parseInt(args[3]) - 1);
 										MessageEmbed.Field field = null;
 										StringBuilder stringBuilder = new StringBuilder();
+
+
 										for (int i = 5; i < args.length; i++) {
 											stringBuilder.append(args[i]).append(" ");
 										}
+
 										switch (args[4].toLowerCase()) {
-											case "removefield":
-												List<MessageEmbed.Field> tempFields = new ArrayList<>();
-												MessageEmbed.Field fieldtoremove = fieldlist.get(Integer.parseInt(args[3]) - 1);
-												for (MessageEmbed.Field itfield : fieldlist) {
-													if (itfield != fieldtoremove)
-														tempFields.add(itfield);
-												}
-												fieldlist = tempFields;
+											case "removefield": ;
+												fieldlist.remove(oldfield);
 												msg.addReaction("✔").queue();
 												break;
 											case "settitle":
 												field = new MessageEmbed.Field(stringBuilder.toString(), oldfield.getValue(), oldfield.isInline());
+												fieldlist.set(Integer.parseInt(args[3]) - 1, field);
+
 												msg.addReaction("✔").queue();
 												break;
 											case "setdescription":
 												field = new MessageEmbed.Field(oldfield.getName(), stringBuilder.toString() + "\n", oldfield.isInline());
+												fieldlist.set(Integer.parseInt(args[3]) - 1, field);
 												msg.addReaction("✔").queue();
 												break;
 											case "setinline":
 												field = new MessageEmbed.Field(oldfield.getName(), oldfield.getValue(), Boolean.parseBoolean(args[5]));
+												fieldlist.set(Integer.parseInt(args[3]) - 1, field);
 												msg.addReaction("✔").queue();
 												break;
 											default:
@@ -129,7 +135,6 @@ public class EditEmbedCommand implements GuildCommand {
 												break;
 										}
 										builder.clearFields();
-										fieldlist.set(Integer.parseInt(args[3]) - 1, field);
 										for (MessageEmbed.Field addfield : fieldlist) {
 											builder.addField(addfield);
 										}

@@ -4,10 +4,14 @@ import net.Tomatentum.TomatenMaster.main.DiscordBot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.utils.AttachmentOption;
 
-import java.io.IOException;
+import java.awt.*;
+import java.io.*;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.List;
 
 public class Ticket {
 	private TextChannel channel;
@@ -17,6 +21,8 @@ public class Ticket {
 	private Category category;
    	private TicketManager ticketManager;
    	private int ID;
+   	
+   	private File transcriptFolder = new File("Transcripts");
 
 	public Ticket(Member owner, Category category, DiscordBot bot) {
 		this.members = new ArrayList<>();
@@ -67,6 +73,68 @@ public class Ticket {
 	}
 
 	public void close() {
+
+
+		if (!transcriptFolder.exists()) {
+			transcriptFolder.mkdir();
+
+		}
+
+
+		File transcript = new File(transcriptFolder, "Ticket-" + getID() + ".txt");
+		if (!transcript.exists()) {
+			try {
+				transcript.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+				return;
+			}
+		}
+
+		BufferedWriter writer;
+
+		try {
+			writer = new BufferedWriter(new FileWriter(transcript));
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
+
+		List<Message> messages = (getChannel().getIterableHistory().complete());
+		Collections.reverse(messages);
+		
+		for (Message message : messages) {
+			if (message.getAuthor().isBot())
+				continue;
+
+			OffsetDateTime time = message.getTimeCreated();
+
+			try {
+				writer.write("[" + time.getDayOfMonth() + "." + time.getMonthValue() + "." + time.getYear() + " | " + time.getHour() + ":" + time.getMinute()
+						+ "] " + message.getAuthor().getName() + " >> " + message.getContentRaw() + "\n");
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		try {
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+
+		EmbedBuilder transcriptBuilder = new EmbedBuilder();
+		transcriptBuilder.setColor(Color.CYAN);
+		transcriptBuilder.setTimestamp(OffsetDateTime.now());
+		transcriptBuilder.setAuthor(guild.getName(), null, guild.getIconUrl());
+		transcriptBuilder.setTitle("Transcript for Ticket-" + ID);
+		transcriptBuilder.setDescription("See Attachement");
+		
+		for (Member member : getMembers()) {
+			member.getUser().openPrivateChannel().complete().sendMessage(transcriptBuilder.build()).addFile(new File(transcript.getAbsolutePath())).complete();
+		}
+
 		channel.getManager().setParent(channel.getGuild().getCategoryById(846836212030373940L)).complete();
 		for (Member member : members) {
 			channel.putPermissionOverride(member).deny(Permission.MESSAGE_WRITE).queue();
@@ -93,6 +161,9 @@ public class Ticket {
 		mainMessage.clearReactions().queue();
 		mainMessage.addReaction("🔓").queue();
 		mainMessage.addReaction("🛑").queue();
+		
+
+
 		System.out.println("[Ticket-" + ID + "] closed!");
 	}
 	public void addMember(Member member) {

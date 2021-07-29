@@ -13,12 +13,15 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class GuildMusicManager {
+public class GuildMusicManager extends ListenerAdapter {
 
 	private AudioPlayer player;
 	private Guild guild;
@@ -159,6 +162,12 @@ public class GuildMusicManager {
 				}
 			}
 		}, delaymillis, delaymillis);
+	}
+	@Override
+	public void onGuildVoiceLeave(@NotNull GuildVoiceLeaveEvent event) {
+		if (event.getMember().getUser().equals(DiscordBot.getINSTANCE().getBot().getSelfUser())) {
+			quit();
+		}
 	}
 
 
