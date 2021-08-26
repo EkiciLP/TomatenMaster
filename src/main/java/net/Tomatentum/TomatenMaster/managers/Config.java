@@ -9,7 +9,6 @@ public class Config {
 	private YamlConfiguration config;
 	private File file;
 	private YamlConfiguration rrconfig;
-	boolean isnew= false;
 	private File rrfile;
 
 
@@ -20,7 +19,6 @@ public class Config {
 			this.rrfile = new File("rrdata.yml");
 			if (!file.exists()) {
 				file.createNewFile();
-				isnew = true;
 			}
 			if (!rrfile.exists()) {
 				rrfile.createNewFile();
@@ -30,11 +28,10 @@ public class Config {
 		}
 		config = YamlConfiguration.loadConfiguration(file);
 		rrconfig = YamlConfiguration.loadConfiguration(rrfile);
-		if (isnew) {
-			config.set("TOKEN", null);
-			save();
-		}
+
+		config.addDefault("TOKEN", 0);
 		System.out.println("[Config] loaded Config");
+
 
 	}
 	public void save() {

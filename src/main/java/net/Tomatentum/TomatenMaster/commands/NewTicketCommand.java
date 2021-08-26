@@ -1,8 +1,8 @@
 package net.Tomatentum.TomatenMaster.commands;
 
 import net.Tomatentum.TomatenMaster.managers.Ticket;
-import net.Tomatentum.TomatenMaster.main.util.GuildCommand;
-import net.Tomatentum.TomatenMaster.main.DiscordBot;
+import net.Tomatentum.TomatenMaster.util.GuildCommand;
+import net.Tomatentum.TomatenMaster.TomatenMaster;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -11,8 +11,8 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class NewTicketCommand implements GuildCommand {
-	private DiscordBot bot;
-	public NewTicketCommand(DiscordBot bot) {
+	private TomatenMaster bot;
+	public NewTicketCommand(TomatenMaster bot) {
 		this.bot = bot;
 	}
 	@Override

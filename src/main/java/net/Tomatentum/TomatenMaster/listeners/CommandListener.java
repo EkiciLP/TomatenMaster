@@ -1,6 +1,6 @@
 package net.Tomatentum.TomatenMaster.listeners;
 
-import net.Tomatentum.TomatenMaster.main.DiscordBot;
+import net.Tomatentum.TomatenMaster.TomatenMaster;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -9,9 +9,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import java.util.concurrent.TimeUnit;
 
 public class CommandListener extends ListenerAdapter {
-	private DiscordBot bot;
+	private TomatenMaster bot;
 	private Thread cmdthread;
-	public CommandListener(DiscordBot bot)  {
+	public CommandListener(TomatenMaster bot)  {
 		this.bot = bot;
 	}
 

@@ -1,6 +1,6 @@
 package net.Tomatentum.TomatenMaster.commands;
 
-import net.Tomatentum.TomatenMaster.main.util.GuildCommand;
+import net.Tomatentum.TomatenMaster.util.GuildCommand;
 import net.Tomatentum.TomatenMaster.managers.Suggestion;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;

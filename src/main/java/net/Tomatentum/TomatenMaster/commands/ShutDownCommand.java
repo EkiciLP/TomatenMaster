@@ -1,7 +1,7 @@
 package net.Tomatentum.TomatenMaster.commands;
 
-import net.Tomatentum.TomatenMaster.main.DiscordBot;
-import net.Tomatentum.TomatenMaster.main.util.GuildCommand;
+import net.Tomatentum.TomatenMaster.TomatenMaster;
+import net.Tomatentum.TomatenMaster.util.GuildCommand;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -9,9 +9,9 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 public class ShutDownCommand implements GuildCommand {
-	private DiscordBot bot;
+	private TomatenMaster bot;
 
-	public ShutDownCommand(DiscordBot bot) {
+	public ShutDownCommand(TomatenMaster bot) {
 		this.bot = bot;
 	}
 

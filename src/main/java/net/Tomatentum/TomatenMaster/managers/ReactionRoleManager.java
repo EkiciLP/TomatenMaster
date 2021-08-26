@@ -1,6 +1,6 @@
 package net.Tomatentum.TomatenMaster.managers;
 
-import net.Tomatentum.TomatenMaster.main.DiscordBot;
+import net.Tomatentum.TomatenMaster.TomatenMaster;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
@@ -13,8 +13,8 @@ import java.util.Map;
 
 
 public class ReactionRoleManager extends ListenerAdapter {
-	private DiscordBot bot;
-	public ReactionRoleManager(DiscordBot bot) {
+	private TomatenMaster bot;
+	public ReactionRoleManager(TomatenMaster bot) {
 		this.bot = bot;
 
 	}
@@ -30,7 +30,7 @@ public class ReactionRoleManager extends ListenerAdapter {
 
 
 	public void removeReactionRole(TextChannel channel, Message message, String emoji) {
-		bot.getConfig().getRrconfig().set(channel.getIdLong() + "." + message.getIdLong() + "." + emoji, 0);
+		bot.getConfig().getRrconfig().getConfigurationSection(channel.getIdLong() + "." + message.getIdLong()).getKeys(false).remove(emoji);
 		bot.getConfig().save();
 		message.clearReactions(emoji).queue();
 	}

@@ -1,9 +1,10 @@
-package net.Tomatentum.TomatenMaster.main;
+package net.Tomatentum.TomatenMaster;
 
-import
-		net.Tomatentum.TomatenMaster.managers.TicketManager;
+import net.Tomatentum.TomatenMaster.autovoicechannels.AutoVoiceChannelManager;
+import net.Tomatentum.TomatenMaster.database.Database;
+import net.Tomatentum.TomatenMaster.managers.TicketManager;
 import net.Tomatentum.TomatenMaster.commands.*;
-import net.Tomatentum.TomatenMaster.main.util.CommandManager;
+import net.Tomatentum.TomatenMaster.util.CommandManager;
 import net.Tomatentum.TomatenMaster.commands.EditEmbedCommand;
 import net.Tomatentum.TomatenMaster.listeners.*;
 import net.Tomatentum.TomatenMaster.managers.*;
@@ -12,40 +13,39 @@ import net.Tomatentum.TomatenMaster.music.commands.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 
 import javax.security.auth.login.LoginException;
+import javax.xml.crypto.Data;
 import java.util.Scanner;
 
-public class DiscordBot {
-	private JDABuilder buildbot;
-	private JDA bot;
-	private CommandManager cmdmanager;
-	private AutoVoiceChannelManager autoVoiceChannelManager;
-	private TicketManager ticketManager;
-	private Config config;
-	private EmbedManager embedManager;
-	private WarningManager warningManager;
-	private PunishManager punishManager;
-	private ReactionRoleManager reactionRole;
-	private static DiscordBot INSTANCE;
-	private AudioManager audioManager;
+public class TomatenMaster {
+	private final TextChannel protocolChannel;
+	private final JDA bot;
+	private final CommandManager cmdmanager;
+	private final AutoVoiceChannelManager autoVoiceChannelManager;
+	private final TicketManager ticketManager;
+	private final Config config;
+	private final EmbedManager embedManager;
+	private final PunishManager punishManager;
+	private final ReactionRoleManager reactionRole;
+	private static TomatenMaster INSTANCE;
+	private final AudioManager audioManager;
 
-	public DiscordBot() throws LoginException, InterruptedException {
+	public TomatenMaster() throws LoginException, InterruptedException {
+
 		INSTANCE = this;
 		config = new Config();
-		buildbot = JDABuilder.createDefault(config.getYML().getString("TOKEN"));
-		buildbot.setStatus(OnlineStatus.IDLE);
+		JDABuilder buildbot = JDABuilder.createDefault(config.getYML().getString("TOKEN"));
 		buildbot.addEventListeners(new CommandListener(this));
-		buildbot.addEventListeners(new VoiceListener(this));
 		buildbot.addEventListeners(new ReactionListener(this));
 		buildbot.addEventListeners(new GuildListener(this));
 		buildbot.addEventListeners(new AutoModListener(this));
 		buildbot.addEventListeners(new ReactionRoleManager(this));
-		buildbot.addEventListeners(new ProtocolManager(this));
 
 
 		buildbot.setMemberCachePolicy(MemberCachePolicy.ALL);
@@ -63,11 +63,20 @@ public class DiscordBot {
 		autoVoiceChannelManager = new AutoVoiceChannelManager(this);
 		ticketManager = new TicketManager(this);
 		embedManager = new EmbedManager(this);
-		warningManager = new WarningManager(this);
 		punishManager = new PunishManager(this);
 		reactionRole = new ReactionRoleManager(this);
 		audioManager = new AudioManager(this);
+		protocolChannel = bot.getTextChannelById(835092656836050964L);
 
+
+		registerCommands();
+
+		exitlistener();
+
+
+	}
+
+	private void registerCommands() {
 		cmdmanager.registerCommand("clear", new ClearCommand());
 		cmdmanager.registerCommand("panel",new PanelCommand(this));
 		cmdmanager.registerCommand("close", new CloseCommand(this));
@@ -82,14 +91,15 @@ public class DiscordBot {
 		cmdmanager.registerCommand("lock", new LockCommand());
 		cmdmanager.registerCommand("autorole", new AutoRoleCommand(this));
 		cmdmanager.registerCommand("welcome", new WelcomeCommand(this));
-		cmdmanager.registerCommand("warn", new WarnCommand(this));
-		cmdmanager.registerCommand("warnings", new WarningsCommand(this));
-		cmdmanager.registerCommand("mute", new MuteCommand(this));
-		cmdmanager.registerCommand("ban", new BanCommand(this));
+		cmdmanager.registerCommand(new WarnCommand(this));
+		cmdmanager.registerCommand(new WarningsCommand(this));
+		cmdmanager.registerCommand(new MuteCommand(this));
+		cmdmanager.registerCommand(new UnmuteCommand());
+		cmdmanager.registerCommand(new BanCommand(this));
 		cmdmanager.registerCommand("rr", new ReactionRoleCommand(this));
 		cmdmanager.registerCommand("shutdown", new ShutDownCommand(this));
 		cmdmanager.registerCommand("suggest", new SuggestCommand());
-		cmdmanager.registerCommand("approve", new ApproveCommand());
+		cmdmanager.registerCommand(new ApproveCommand());
 		cmdmanager.registerCommand("reject", new RejectCommand());
 		cmdmanager.registerCommand("play", new PlayCommand());
 		cmdmanager.registerCommand("skip", new SkipCommand());
@@ -101,14 +111,12 @@ public class DiscordBot {
 		cmdmanager.registerCommand("volume", new VolumeCommand());
 		cmdmanager.registerCommand("pause", new PauseCommand());
 		cmdmanager.registerCommand("resume", new PauseCommand());
-
-		exitlistener();
-
-
 	}
+
+
 	public static void main(String[] args) {
 		try {
-			new DiscordBot();
+			new TomatenMaster();
 		}catch (LoginException | InterruptedException e) {
 			e.printStackTrace();
 			System.out.println("Bot could not be loaded!");
@@ -127,6 +135,7 @@ public class DiscordBot {
 			bot.getPresence().setStatus(OnlineStatus.OFFLINE);
 			System.out.println("Bot offline");
 			bot.shutdown();
+			Database.close();
 			System.exit(0);
 
 		}
@@ -171,10 +180,6 @@ public class DiscordBot {
 		return embedManager;
 	}
 
-	public WarningManager getWarningManager() {
-		return warningManager;
-	}
-
 	public PunishManager getPunishManager() {
 		return punishManager;
 	}
@@ -183,7 +188,7 @@ public class DiscordBot {
 		return reactionRole;
 	}
 
-	public static DiscordBot getINSTANCE() {
+	public static TomatenMaster getINSTANCE() {
 		return INSTANCE;
 	}
 
@@ -191,4 +196,8 @@ public class DiscordBot {
 		return audioManager;
 	}
 
+
+	public TextChannel getProtocolChannel() {
+		return protocolChannel;
+	}
 }

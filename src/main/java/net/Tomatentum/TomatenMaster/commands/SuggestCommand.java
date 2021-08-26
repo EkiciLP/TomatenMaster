@@ -1,7 +1,7 @@
 package net.Tomatentum.TomatenMaster.commands;
 
-import net.Tomatentum.TomatenMaster.main.DiscordBot;
-import net.Tomatentum.TomatenMaster.main.util.GuildCommand;
+import net.Tomatentum.TomatenMaster.TomatenMaster;
+import net.Tomatentum.TomatenMaster.util.GuildCommand;
 import net.Tomatentum.TomatenMaster.managers.Suggestion;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -14,8 +14,8 @@ public class SuggestCommand implements GuildCommand {
 		msg.delete().queue();
 		if (member.hasPermission(Permission.MANAGE_CHANNEL)) {
 			if (args[1].equals("setchannel")) {
-				DiscordBot.getINSTANCE().getConfig().getYML().set("Suggestions.suggestionchannel", channel.getIdLong());
-				DiscordBot.getINSTANCE().getConfig().save();
+				TomatenMaster.getINSTANCE().getConfig().getYML().set("Suggestions.suggestionchannel", channel.getIdLong());
+				TomatenMaster.getINSTANCE().getConfig().save();
 				return;
 			}
 		}
@@ -24,7 +24,7 @@ public class SuggestCommand implements GuildCommand {
 		for (int i = 1; i < args.length; i++) {
 			stringBuilder.append(args[i]).append(" ");
 		}
-		TextChannel sugchannel = channel.getGuild().getTextChannelById(DiscordBot.getINSTANCE().getConfig().getYML().getLong("Suggestions.suggestionchannel"));
+		TextChannel sugchannel = channel.getGuild().getTextChannelById(TomatenMaster.getINSTANCE().getConfig().getYML().getLong("Suggestions.suggestionchannel"));
 		new Suggestion(sugchannel, member, stringBuilder.toString());
 	}
 }

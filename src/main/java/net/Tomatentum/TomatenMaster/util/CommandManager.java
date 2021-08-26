@@ -1,4 +1,4 @@
-package net.Tomatentum.TomatenMaster.main.util;
+package net.Tomatentum.TomatenMaster.util;
 
 import net.dv8tion.jda.api.entities.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,6 +13,10 @@ public class CommandManager {
 
 	public void registerCommand(String Command, GuildCommand provider){
 		this.commands.put(Command, provider);
+	}
+
+	public void registerCommand(SlashCommand command) {
+
 	}
 	public boolean runCommand(String Command, Member member, TextChannel channel, Message msg, String [] args) {
 		if (this.commands.containsKey(Command.toLowerCase())) {

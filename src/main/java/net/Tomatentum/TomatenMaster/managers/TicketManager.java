@@ -1,6 +1,6 @@
 package net.Tomatentum.TomatenMaster.managers;
 
-import net.Tomatentum.TomatenMaster.main.DiscordBot;
+import net.Tomatentum.TomatenMaster.TomatenMaster;
 import net.dv8tion.jda.api.entities.*;
 
 import java.io.IOException;
@@ -9,11 +9,11 @@ import java.util.*;
 public class TicketManager {
 
 	private Message panel;
-	private DiscordBot bot;
+	private TomatenMaster bot;
 	private HashMap<TextChannel, Ticket> openTickets;
 	public List<Member> ownerlist;
 	private HashMap<TextChannel, Ticket> closedTickets;
-	public TicketManager(DiscordBot bot) {
+	public TicketManager(TomatenMaster bot) {
 		this.bot = bot;
 		this.openTickets = new HashMap<>();
 		this.closedTickets = new HashMap<>();

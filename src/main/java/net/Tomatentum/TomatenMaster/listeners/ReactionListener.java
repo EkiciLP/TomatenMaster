@@ -1,7 +1,7 @@
 package net.Tomatentum.TomatenMaster.listeners;
 
 import net.Tomatentum.TomatenMaster.managers.Ticket;
-import net.Tomatentum.TomatenMaster.main.DiscordBot;
+import net.Tomatentum.TomatenMaster.TomatenMaster;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -10,9 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 public class ReactionListener extends ListenerAdapter {
-	private DiscordBot bot;
+	private TomatenMaster bot;
 
-	public ReactionListener(DiscordBot bot) {
+	public ReactionListener(TomatenMaster bot) {
 		this.bot = bot;
 	}
 

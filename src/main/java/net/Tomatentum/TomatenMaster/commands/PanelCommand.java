@@ -1,7 +1,7 @@
 package net.Tomatentum.TomatenMaster.commands;
 
-import net.Tomatentum.TomatenMaster.main.util.GuildCommand;
-import net.Tomatentum.TomatenMaster.main.DiscordBot;
+import net.Tomatentum.TomatenMaster.util.GuildCommand;
+import net.Tomatentum.TomatenMaster.TomatenMaster;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -9,8 +9,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 
 public class PanelCommand implements GuildCommand {
-	private DiscordBot bot;
-	public PanelCommand(DiscordBot bot) {
+	private TomatenMaster bot;
+	public PanelCommand(TomatenMaster bot) {
 		this.bot = bot;
 	}
 	@Override

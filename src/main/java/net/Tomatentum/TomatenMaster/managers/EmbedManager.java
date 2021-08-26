@@ -1,6 +1,6 @@
 package net.Tomatentum.TomatenMaster.managers;
 
-import net.Tomatentum.TomatenMaster.main.DiscordBot;
+import net.Tomatentum.TomatenMaster.TomatenMaster;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -9,10 +9,10 @@ import net.dv8tion.jda.api.entities.TextChannel;
 import java.io.IOException;
 
 public class EmbedManager {
-	private DiscordBot bot;
+	private TomatenMaster bot;
 
 
-	public EmbedManager(DiscordBot bot) {
+	public EmbedManager(TomatenMaster bot) {
 		this.bot = bot;
 		System.out.println("[EmbedManager] initialized");
 	}

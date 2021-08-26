@@ -1,47 +1,37 @@
 package net.Tomatentum.TomatenMaster.commands;
 
-import net.Tomatentum.TomatenMaster.main.util.GuildCommand;
+import net.Tomatentum.TomatenMaster.util.GuildCommand;
 import net.Tomatentum.TomatenMaster.managers.Suggestion;
+import net.Tomatentum.TomatenMaster.util.SlashCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import java.awt.*;
 import java.util.concurrent.TimeUnit;
 
-public class ApproveCommand implements GuildCommand {
+public class ApproveCommand extends SlashCommand {
+
+	public ApproveCommand() {
+		super("approve", "Approves the specified suggestion.", Permission.MESSAGE_MANAGE);
+		getCommand().editCommand()
+				.addOption(OptionType.INTEGER, "id", "The id of the suggestion", true)
+				.queue();
+	}
 	@Override
-	public void onCommand(Member member, TextChannel channel, Message msg, String[] args) {
-		if (member.hasPermission(Permission.MESSAGE_MANAGE)) {
-			if (args.length == 2) {
-				try {
-					Suggestion suggestion = Suggestion.getSuggestionById(Integer.parseInt(args[1]));
-					if (suggestion != null) {
-						suggestion.approve();
-						msg.delete().queue();
-					}else {
-						msg.addReaction("❌").queue();
-						msg.delete().queueAfter(10, TimeUnit.SECONDS);
-					}
-				} catch (NumberFormatException e) {
-					EmbedBuilder builder = new EmbedBuilder();
-					builder.setColor(Color.RED).setTitle("Invalid args").setDescription("!approve SuggestionID");
-					channel.sendMessage(builder.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
-					builder.clear();
-				}
-			}else {
-				EmbedBuilder builder = new EmbedBuilder();
-				builder.setColor(Color.RED).setTitle("Invalid args").setDescription("!approve SuggestionID");
-				channel.sendMessage(builder.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
-				builder.clear();
-			}
+	public void execute(SlashCommandEvent command) {
+		command.deferReply(true).queue();
+		Suggestion suggestion = Suggestion.getSuggestionById((int) command.getOption("id").getAsLong());
+		if (suggestion != null) {
+			suggestion.approve();
+			command.getHook().sendMessage("✅ Suggestion **" + command.getOption("id").getAsString() + "** approved!").setEphemeral(true).queue();
 		}else {
-			EmbedBuilder builder = new EmbedBuilder();
-			builder.setTitle("No Permission for Command: !approve");
-			builder.setColor(Color.RED);
-			channel.sendMessage(builder.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
+			command.getHook().sendMessage("❎ Suggestion **" + command.getOption("id").getAsString() + "** not existing!").setEphemeral(true).queue();
+
 		}
 	}
 }

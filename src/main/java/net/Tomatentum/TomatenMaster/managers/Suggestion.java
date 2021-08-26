@@ -1,6 +1,6 @@
 package net.Tomatentum.TomatenMaster.managers;
 
-import net.Tomatentum.TomatenMaster.main.DiscordBot;
+import net.Tomatentum.TomatenMaster.TomatenMaster;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -18,12 +18,12 @@ public class Suggestion {
 
 	private Message message;
 	private final TextChannel channel;
-	private final DiscordBot bot = DiscordBot.getINSTANCE();
+	private final TomatenMaster bot = TomatenMaster.getINSTANCE();
 	private EmbedBuilder builder;
 	private final int ID;
 
 	public static Suggestion getSuggestionById(int ID) {
-		if (ID < DiscordBot.getINSTANCE().getConfig().getYML().getInt("Suggestions.nextID")) {
+		if (ID < TomatenMaster.getINSTANCE().getConfig().getYML().getInt("Suggestions.nextID")) {
 			return new Suggestion(ID);
 		}
 

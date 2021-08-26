@@ -1,7 +1,7 @@
 package net.Tomatentum.TomatenMaster.commands;
 
-import net.Tomatentum.TomatenMaster.main.util.GuildCommand;
-import net.Tomatentum.TomatenMaster.main.DiscordBot;
+import net.Tomatentum.TomatenMaster.util.GuildCommand;
+import net.Tomatentum.TomatenMaster.TomatenMaster;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -13,8 +13,8 @@ import java.awt.*;
 import java.util.concurrent.TimeUnit;
 
 public class ReactionRoleCommand implements GuildCommand {
-	private DiscordBot bot;
-	public ReactionRoleCommand(DiscordBot bot) {
+	private TomatenMaster bot;
+	public ReactionRoleCommand(TomatenMaster bot) {
 		this.bot = bot;
 	}
 	@Override

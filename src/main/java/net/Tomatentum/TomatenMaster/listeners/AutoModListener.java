@@ -1,6 +1,6 @@
 package net.Tomatentum.TomatenMaster.listeners;
 
-import net.Tomatentum.TomatenMaster.main.DiscordBot;
+import net.Tomatentum.TomatenMaster.TomatenMaster;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.guild.GuildMessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -14,8 +14,8 @@ public class AutoModListener extends ListenerAdapter {
 	private List<String> badwordlist;
 	private HashMap<Member, Long> spamlist;
 	private HashMap<Member, Integer> spammsgcount;
-	private DiscordBot bot;
-	public AutoModListener(DiscordBot bot) {
+	private TomatenMaster bot;
+	public AutoModListener(TomatenMaster bot) {
 		this.bot = bot;
 		spamlist = new HashMap<>();
 		badwordlist = new ArrayList<>();
@@ -29,7 +29,7 @@ public class AutoModListener extends ListenerAdapter {
 		for (String word : badwordlist) {
 			if (event.getMessage().getContentDisplay().toLowerCase().contains(word)) {
 				event.getMessage().delete().queue();
-				bot.getWarningManager().addWarning(event.getMember(), event.getChannel(),"Bad word: " + word);
+				bot.getPunishManager().addWarning(event.getMember(),"Bad word: " + word);
 			}
 		}
 		if (spamlist.containsKey(event.getMember())) {
@@ -43,7 +43,7 @@ public class AutoModListener extends ListenerAdapter {
 					event.getMessage().delete().queue();
 					spamlist.remove(event.getMember());
 					if (spammsgcount.get(event.getMember()) == 3) {
-						bot.getWarningManager().addWarning(event.getMember(), event.getChannel(), "Spam (Automatic)");
+						bot.getPunishManager().addWarning(event.getMember(), "Spam (Automatic)");
 						spammsgcount.remove(event.getMember());
 					}
 				}else {

@@ -4,11 +4,9 @@ import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
-import net.Tomatentum.TomatenMaster.main.DiscordBot;
+import net.Tomatentum.TomatenMaster.TomatenMaster;
 import net.dv8tion.jda.api.entities.Activity;
 
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.util.*;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -31,10 +29,10 @@ public class TrackScheduler extends AudioEventAdapter {
 			@Override
 			public void run() {
 				if (currentTrack != null) {
-					String track = player.getPlayingTrack().getInfo().title + " [" + DiscordBot.getTimestamp(player.getPlayingTrack().getPosition()) + "/" + DiscordBot.getTimestamp(player.getPlayingTrack().getDuration()) + "]";
-					DiscordBot.getINSTANCE().getBot().getPresence().setActivity(Activity.playing(track));
+					String track = player.getPlayingTrack().getInfo().title + " [" + TomatenMaster.getTimestamp(player.getPlayingTrack().getPosition()) + "/" + TomatenMaster.getTimestamp(player.getPlayingTrack().getDuration()) + "]";
+					TomatenMaster.getINSTANCE().getBot().getPresence().setActivity(Activity.playing(track));
 				}else
-					DiscordBot.getINSTANCE().getBot().getPresence().setActivity(null);
+					TomatenMaster.getINSTANCE().getBot().getPresence().setActivity(null);
 			}
 		}, 6000, 6000);
 	}
@@ -88,7 +86,7 @@ public class TrackScheduler extends AudioEventAdapter {
 		StringBuilder stringBuilder = new StringBuilder();
 		int count = 1;
 		for (AudioTrack track : queue) {
-			stringBuilder.append(count).append(": ").append(track.getInfo().title).append(" [").append(DiscordBot.getTimestamp(track.getDuration())).append("]\n");
+			stringBuilder.append(count).append(": ").append(track.getInfo().title).append(" [").append(TomatenMaster.getTimestamp(track.getDuration())).append("]\n");
 			count++;
 		}
 		return stringBuilder.toString();

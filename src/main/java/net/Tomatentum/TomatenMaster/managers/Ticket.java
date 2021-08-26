@@ -1,15 +1,13 @@
 package net.Tomatentum.TomatenMaster.managers;
 
-import net.Tomatentum.TomatenMaster.main.DiscordBot;
+import net.Tomatentum.TomatenMaster.TomatenMaster;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.utils.AttachmentOption;
 
 import java.awt.*;
 import java.io.*;
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
 
@@ -24,7 +22,7 @@ public class Ticket {
    	
    	private File transcriptFolder = new File("Transcripts");
 
-	public Ticket(Member owner, Category category, DiscordBot bot) {
+	public Ticket(Member owner, Category category, TomatenMaster bot) {
 		this.members = new ArrayList<>();
 		members.add(owner);
 		this.guild = category.getGuild();

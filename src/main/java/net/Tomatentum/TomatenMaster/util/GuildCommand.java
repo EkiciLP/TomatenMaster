@@ -1,4 +1,4 @@
-package net.Tomatentum.TomatenMaster.main.util;
+package net.Tomatentum.TomatenMaster.util;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;

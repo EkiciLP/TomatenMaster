@@ -1,7 +1,7 @@
 package net.Tomatentum.TomatenMaster.commands;
 
-import net.Tomatentum.TomatenMaster.main.util.GuildCommand;
-import net.Tomatentum.TomatenMaster.main.DiscordBot;
+import net.Tomatentum.TomatenMaster.util.GuildCommand;
+import net.Tomatentum.TomatenMaster.TomatenMaster;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class EditEmbedCommand implements GuildCommand {
-	private DiscordBot bot;
+	private TomatenMaster bot;
 
-	public EditEmbedCommand(DiscordBot bot) {
+	public EditEmbedCommand(TomatenMaster bot) {
 		this.bot = bot;
 	}
 

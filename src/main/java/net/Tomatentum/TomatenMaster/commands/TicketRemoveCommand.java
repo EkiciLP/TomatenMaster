@@ -1,7 +1,7 @@
 package net.Tomatentum.TomatenMaster.commands;
 
-import net.Tomatentum.TomatenMaster.main.util.GuildCommand;
-import net.Tomatentum.TomatenMaster.main.DiscordBot;
+import net.Tomatentum.TomatenMaster.util.GuildCommand;
+import net.Tomatentum.TomatenMaster.TomatenMaster;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -11,8 +11,8 @@ import java.util.concurrent.TimeUnit;
 
 
 public class TicketRemoveCommand implements GuildCommand {
-	private DiscordBot bot;
-	public TicketRemoveCommand(DiscordBot bot) {
+	private TomatenMaster bot;
+	public TicketRemoveCommand(TomatenMaster bot) {
 		this.bot = bot;
 	}
 	@Override

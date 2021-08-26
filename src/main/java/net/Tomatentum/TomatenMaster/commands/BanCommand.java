@@ -1,66 +1,54 @@
 package net.Tomatentum.TomatenMaster.commands;
 
-import net.Tomatentum.TomatenMaster.main.util.GuildCommand;
-import net.Tomatentum.TomatenMaster.main.DiscordBot;
+import net.Tomatentum.TomatenMaster.util.Embed;
+import net.Tomatentum.TomatenMaster.util.GuildCommand;
+import net.Tomatentum.TomatenMaster.TomatenMaster;
+import net.Tomatentum.TomatenMaster.util.SlashCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import java.awt.*;
 import java.util.concurrent.TimeUnit;
 
-public class BanCommand implements GuildCommand {
-	private DiscordBot bot;
-	public BanCommand(DiscordBot bot) {
+public class BanCommand extends SlashCommand
+{
+	private TomatenMaster bot;
+	public BanCommand(TomatenMaster bot)
+	{
+		super("ban", "Bans the specified member for the specified time.", Permission.BAN_MEMBERS);
 		this.bot = bot;
+
+		getCommand().editCommand()
+				.addOption(OptionType.USER,"user", "The user you want to ban", true)
+				.addOption(OptionType.STRING, "reason", "Why you want to ban this user.", true)
+				.addOption(OptionType.INTEGER, "time", "The duration of the Ban in minutes.", false)
+				.queue();
 	}
+
+
 	@Override
-	public void onCommand(Member member, TextChannel channel, Message msg, String[] args) {
-		if (member.hasPermission(Permission.BAN_MEMBERS)) {
-			if (args.length == 4) {
-				User target;
-				StringBuilder stringBuilder = new StringBuilder();
-				int time;
-				for (int i = 3; i<args.length; i++) {
-					stringBuilder.append(args[i]).append(" ");
-				}
-				try {
-					target = msg.getMentionedMembers().get(0).getUser();
-					time = Integer.parseInt(args[2])*60000;
-				}catch (IndexOutOfBoundsException | NumberFormatException e) {
-					EmbedBuilder builder = new EmbedBuilder();
-					builder.setColor(Color.RED).setTitle("Invalid args").setDescription("!ban @member <time(minutes)> <reason>");
-					channel.sendMessage(builder.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
-					builder.clear();
-					return;
-				}
-				if (!channel.getGuild().retrieveBanList().complete().contains(channel.getGuild().retrieveBan(target).complete())) {
-					bot.getPunishManager().banMember(member, Integer.parseInt(args[2]), stringBuilder.toString());
-					EmbedBuilder builder = new EmbedBuilder();
-					builder.setColor(Color.GREEN);
-					builder.setDescription("❌ Banned " + target.getAsMention() + "\nBanned for " + args[2] + " minutes!");
-					builder.setFooter(channel.getGuild().getName(), channel.getGuild().getIconUrl());
-					channel.sendMessage(builder.build()).complete().delete().queueAfter(20, TimeUnit.SECONDS);
-					builder.clear();
-				}else{
-					EmbedBuilder builder = new EmbedBuilder();
-					builder.setColor(Color.GREEN);
-					builder.setDescription("✅ Unbanned " + target.getAsMention());
-					builder.setFooter(channel.getGuild().getName(), channel.getGuild().getIconUrl());
-					channel.sendMessage(builder.build()).complete().delete().queueAfter(20, TimeUnit.SECONDS);
-					builder.clear();
-				}
-			}else {
-				EmbedBuilder builder = new EmbedBuilder();
-				builder.setColor(Color.RED).setTitle("Invalid args").setDescription("!ban @member <time(minutes)> <reason>");
-				channel.sendMessage(builder.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
-				builder.clear();
-			}
-		}else {
-			EmbedBuilder builder = new EmbedBuilder();
-			builder.setTitle("No Permission for Command: !ban");
-			builder.setColor(Color.RED);
-			channel.sendMessage(builder.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
+	public void execute(SlashCommandEvent command)
+	{
+		command.deferReply(true).queue();
+		Member target = command.getOption("user").getAsMember();
+		int time;
+
+		if (target == null)
+		{
+			command.getHook().setEphemeral(true)
+					.sendMessageEmbeds(Embed.simple(Color.RED, "The user is not a member of this guild")).queue();
+			return;
 		}
+
+
+		int caseid = bot.getPunishManager().banUser(command.getGuild(), target.getUser(), (int) command.getOption("time").getAsLong(), command.getOption("reason").getAsString());
+		command.getHook().sendMessageEmbeds(
+				Embed.user(Color.GREEN,"✅ **Case** " + caseid + "closed!\n" + target.getUser().getName() + " has been banned!", target.getUser()))
+				.queue();
+
 	}
 }
