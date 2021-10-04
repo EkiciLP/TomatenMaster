@@ -37,4 +37,15 @@ public class Embed {
 		builder.setColor(color);
 		return builder.build();
 	}
+
+	public static MessageEmbed log(Color color, String text, User user) {
+		EmbedBuilder builder = new EmbedBuilder();
+
+		builder.setColor(color);
+		builder.setDescription(text);
+		builder.setThumbnail(user.getAvatarUrl());
+		builder.setTimestamp(OffsetDateTime.now());
+
+		return builder.build();
+	}
 }

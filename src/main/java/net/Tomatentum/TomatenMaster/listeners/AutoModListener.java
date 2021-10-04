@@ -29,7 +29,7 @@ public class AutoModListener extends ListenerAdapter {
 		for (String word : badwordlist) {
 			if (event.getMessage().getContentDisplay().toLowerCase().contains(word)) {
 				event.getMessage().delete().queue();
-				bot.getPunishManager().addWarning(event.getMember(),"Bad word: " + word);
+				bot.getPunishManager().addWarning(event.getMember(),"Bad word: " + word, event.getGuild().getSelfMember());
 			}
 		}
 		if (spamlist.containsKey(event.getMember())) {
@@ -43,7 +43,7 @@ public class AutoModListener extends ListenerAdapter {
 					event.getMessage().delete().queue();
 					spamlist.remove(event.getMember());
 					if (spammsgcount.get(event.getMember()) == 3) {
-						bot.getPunishManager().addWarning(event.getMember(), "Spam (Automatic)");
+						bot.getPunishManager().addWarning(event.getMember(), "Spam (Automatic)", event.getGuild().getSelfMember());
 						spammsgcount.remove(event.getMember());
 					}
 				}else {

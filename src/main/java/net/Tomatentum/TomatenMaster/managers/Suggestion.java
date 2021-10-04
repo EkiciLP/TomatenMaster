@@ -22,7 +22,7 @@ public class Suggestion {
 	private EmbedBuilder builder;
 	private final int ID;
 
-	public static Suggestion getSuggestionById(int ID) {
+	public static Suggestion getSuggestionById(int ID) throws NullPointerException{
 		if (ID < TomatenMaster.getINSTANCE().getConfig().getYML().getInt("Suggestions.nextID")) {
 			return new Suggestion(ID);
 		}
@@ -30,7 +30,7 @@ public class Suggestion {
 	return null;
 	}
 
-	private Suggestion(int ID) {
+	private Suggestion(int ID) throws NullPointerException {
 		this.ID = ID;
 		this.channel = bot.getBot().getTextChannelById(bot.getConfig().getYML().getLong("Suggestions." + ID + ".channelid"));
 		this.message = channel.retrieveMessageById(bot.getConfig().getYML().getLong("Suggestions." + ID + ".msgid")).complete();
@@ -51,7 +51,7 @@ public class Suggestion {
 		builder.setColor(Color.ORANGE);
 		builder.setDescription(suggestion);
 		builder.setTimestamp(OffsetDateTime.now());
-		message = channel.sendMessage(builder.build()).complete();
+		message = channel.sendMessageEmbeds(builder.build()).complete();
 		message.addReaction("✅").queue();
 		message.addReaction("❌").queue();
 

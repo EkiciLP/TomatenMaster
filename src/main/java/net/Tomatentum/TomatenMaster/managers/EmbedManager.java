@@ -48,7 +48,7 @@ public class EmbedManager {
 		builder.clear();
 		return true;
 	}
-	public MessageEmbed getEmbed(int ID) {
+	public MessageEmbed getEmbed(int ID) throws NullPointerException{
 		TextChannel channel = bot.getBot().getTextChannelById(bot.getConfig().getYML().getLong("Embeds." + ID + ".ChannelID"));
 		Message message = channel.retrieveMessageById(bot.getConfig().getYML().getLong("Embeds." + ID + ".MessageID")).complete();
 		return message.getEmbeds().get(0);

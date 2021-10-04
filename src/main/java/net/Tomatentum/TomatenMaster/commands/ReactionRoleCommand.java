@@ -2,25 +2,40 @@ package net.Tomatentum.TomatenMaster.commands;
 
 import net.Tomatentum.TomatenMaster.util.GuildCommand;
 import net.Tomatentum.TomatenMaster.TomatenMaster;
+import net.Tomatentum.TomatenMaster.util.SlashCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 import java.awt.*;
 import java.util.concurrent.TimeUnit;
 
-public class ReactionRoleCommand implements GuildCommand {
+public class ReactionRoleCommand extends SlashCommand {
 	private TomatenMaster bot;
 	public ReactionRoleCommand(TomatenMaster bot) {
+		super("rr", "Reaction role command for adding and removing reaction roles!", Permission.MANAGE_ROLES);
 		this.bot = bot;
+
+		getCommand().editCommand()
+				.addSubcommands(
+						new SubcommandData("add", "Adds a reaction role")
+						.addOption(OptionType.CHANNEL, "channel", "The channel of the message",true)
+						.addOption(OptionType.NUMBER, "messageid", "The MessageID of the message where the reaction role should be added.", true)
+						.addOption(OptionType.STRING, "emoji", "The emoji of the reaction role", true)
+						.addOption(OptionType.ROLE, "role", "The role of the reaction role", true),
+						new SubcommandData("remove", "Removes a reaction role")
+								.addOption(OptionType.CHANNEL, "channel", "The channel of the message",true)
+								.addOption(OptionType.NUMBER, "messageid", "The MessageID of the message where the reaction role should be removed.", true)
+								.addOption(OptionType.STRING, "emoji", "The emoji of the reaction role", true)
+
+				).queue();
 	}
+
 	@Override
-	public void onCommand(Member member, TextChannel channel, Message msg, String[] args) {
-		msg.delete().queue();
-		if (member.hasPermission(Permission.MANAGE_ROLES)) {
+	public void execute(SlashCommandEvent command) {
 			/*
 			 * args[1] = add/remove
 			 * args[2] = #channel
@@ -28,54 +43,30 @@ public class ReactionRoleCommand implements GuildCommand {
 			 * args[4] = Emoji
 			 * args[5] = @role
 			 */
-			if (args.length >= 6) {
-				TextChannel rchannel;
+
+				MessageChannel channel = command.getOption("channel").getAsMessageChannel();
 				Message message;
-				String emoji;
-				Role role;
+				String emoji = command.getOption("emoji").getAsString();
+
 				try {
-					rchannel = msg.getMentionedChannels().get(0);
-					message = rchannel.retrieveMessageById(args[3]).complete();
-					emoji = args[4];
-					role = msg.getMentionedRoles().get(0);
-				}catch (IndexOutOfBoundsException e) {
-					EmbedBuilder builder = new EmbedBuilder();
-					builder.setColor(Color.RED).setTitle("Invalid args").setDescription("!rr <add/remove> #channel <messageID> <Emoji> @role");
-					channel.sendMessage(builder.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
-					builder.clear();
+					message = channel.retrieveMessageById(command.getOption("messageid").getAsLong()).complete();
+					Emoji.fromUnicode(emoji);
+				}catch (NullPointerException | IllegalArgumentException ex) {
+					command.reply("❌ Please specify correct parameters!").setEphemeral(true).queue();
 					return;
 				}
-				if (args[1].equals("add")) {
-					bot.getReactionRole().addReactionRole(role, emoji, message, rchannel);
-					EmbedBuilder builder = new EmbedBuilder();
-					builder.setColor(Color.GREEN);
-					builder.setDescription("Added Emoji " + emoji + " with the Role " + role.getAsMention() + " on message: " + message.getIdLong());
-					channel.sendMessage(builder.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
-					builder.clear();
-				}else if (args[1].equals("remove")) {
-					bot.getReactionRole().removeReactionRole(rchannel, message, emoji);
-					EmbedBuilder builder = new EmbedBuilder();
-					builder.setColor(Color.RED);
-					builder.setDescription("Removed Emoji " + emoji + " with the Role " + role.getAsMention() + " on message: " + message.getIdLong());
-					channel.sendMessage(builder.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
-					builder.clear();
-				}else {
-					EmbedBuilder builder = new EmbedBuilder();
-					builder.setColor(Color.RED).setTitle("Invalid args").setDescription("!rr <add/remove> #channel <messageID> <Emoji> @role");
-					channel.sendMessage(builder.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
-					builder.clear();
+
+				if (command.getSubcommandName().equals("add")) {
+					bot.getReactionRole().addReactionRole(command.getOption("role").getAsRole(), emoji, message, channel);
+					command.reply("Added Emoji " + emoji + " with the Role " + command.getOption("role").getAsRole().getAsMention() + " on message: " + message.getIdLong()).setEphemeral(true).queue();
+
+				}else if (command.getSubcommandName().equals("remove")) {
+					bot.getReactionRole().removeReactionRole(channel, message, emoji);
+
+					command.reply("Removed Emoji " + emoji + " on message: " + message.getIdLong()).setEphemeral(true).queue();
+
 				}
-			}else {
-				EmbedBuilder builder = new EmbedBuilder();
-				builder.setColor(Color.RED).setTitle("Invalid args").setDescription("!rr <add/remove> #channel <messageID> <Emoji> @role");
-				channel.sendMessage(builder.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
-				builder.clear();
-			}
-		}else {
-			EmbedBuilder builder = new EmbedBuilder();
-			builder.setTitle("No Permission for Command: !rr");
-			builder.setColor(Color.RED);
-			channel.sendMessage(builder.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
-		}
+
+
 	}
 }

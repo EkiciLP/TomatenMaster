@@ -18,15 +18,14 @@ public class ReactionListener extends ListenerAdapter {
 
 	@Override
 	public void onMessageReactionAdd(@NotNull MessageReactionAddEvent event) {
-		if (event.getMember().getUser().isBot()) {return;}
 		if (!event.getMember().getUser().isBot()) {
 			if (event.getMessageIdLong() == bot.getTicketManager().getPanel().getIdLong()) {
+				event.getReaction().removeReaction(event.getUser()).queue();
+
 				if (event.getReactionEmote().getEmoji().equals("🎫")) {
 					if (!bot.getTicketManager().getOwnerlist().contains(event.getMember())) {
 						new Ticket(event.getMember(), Objects.requireNonNull(event.getGuild().getCategoryById(835131959574921277L)), bot);
-						event.getReaction().removeReaction(event.getUser()).queue();
 					}else {
-						event.getReaction().removeReaction(event.getUser()).queue();
 						event.getMember().getUser().openPrivateChannel().complete().sendMessage("***You already have a ticket opened***").queue();
 					}
 				}

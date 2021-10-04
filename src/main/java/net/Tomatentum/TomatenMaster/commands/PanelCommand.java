@@ -2,25 +2,26 @@ package net.Tomatentum.TomatenMaster.commands;
 
 import net.Tomatentum.TomatenMaster.util.GuildCommand;
 import net.Tomatentum.TomatenMaster.TomatenMaster;
+import net.Tomatentum.TomatenMaster.util.SlashCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
-public class PanelCommand implements GuildCommand {
+public class PanelCommand extends SlashCommand {
 	private TomatenMaster bot;
 	public PanelCommand(TomatenMaster bot) {
+		super("panel", "Spawn the support panel in the current channel", Permission.MESSAGE_MANAGE);
 		this.bot = bot;
 	}
 	@Override
-	public void onCommand(Member member, TextChannel channel, Message msg, String[] args) {
-		msg.delete().queue();
-		channel.sendTyping().complete();
-		if (member.hasPermission(Permission.MANAGE_SERVER)) {
+	public void execute(SlashCommandEvent command) {
 			if (bot.getTicketManager().getPanel() != null) {
 				bot.getTicketManager().getPanel().delete().queue();
 			}
+			command.reply("Done").setEphemeral(true).queue();
 
 			EmbedBuilder builder = new EmbedBuilder();
 			builder.setTitle("TomatenTum Support");
@@ -28,11 +29,10 @@ public class PanelCommand implements GuildCommand {
 			builder.setDescription("Welcome to the TomatenTum Support Panel!\nReact with " +
 					"\n" +
 					"\uD83C\uDFAB \nto start a conversation with us!\nWe will help you as soon as we can!");
-			builder.setFooter("- TomatenTum Staff Team", channel.getGuild().getIconUrl());
-			Message message = channel.sendMessage(builder.build()).complete();
+			builder.setFooter("- TomatenTum Staff Team", command.getGuild().getIconUrl());
+			Message message = command.getChannel().sendMessageEmbeds(builder.build()).complete();
 			message.addReaction("🎫").queue();
 			bot.getTicketManager().setPanel(message);
 			builder.clear();
-		}
 	}
 }

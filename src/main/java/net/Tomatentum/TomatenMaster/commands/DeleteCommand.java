@@ -1,27 +1,24 @@
 package net.Tomatentum.TomatenMaster.commands;
 
-import net.Tomatentum.TomatenMaster.util.GuildCommand;
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.Tomatentum.TomatenMaster.util.SlashCommand;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 
-import java.util.concurrent.TimeUnit;
 
-public class DeleteCommand implements GuildCommand {
+public class DeleteCommand extends SlashCommand {
+
+
+	public DeleteCommand() {
+		super("delete", "Deletes the current ticket", Permission.MANAGE_CHANNEL);
+	}
+
 	@Override
-	public void onCommand(Member member, TextChannel channel, Message msg, String[] args) {
-		msg.delete().complete();
-		channel.sendTyping().complete();
-		if (channel.getName().contains("ticket-")) {
-			channel.delete().queue();
+	public void execute(SlashCommandEvent command) {
+		if (command.getTextChannel().getName().contains("ticket-")) {
+			command.reply("⚠ Deleting...").setEphemeral(true).queue();
+			command.getTextChannel().delete().queue();
 		}else {
-			EmbedBuilder builder = new EmbedBuilder();
-			builder.setTitle("Not available");
-			builder.setColor(0xfc0307);
-			builder.setDescription("The Command is not available in this channel.\nIt is only available in tickets");
-			channel.sendMessage(builder.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
-			builder.clear();
+			command.reply("❌ Not available here").setEphemeral(true).queue();
 		}
 	}
 }

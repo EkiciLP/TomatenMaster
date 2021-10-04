@@ -25,7 +25,7 @@ public class BanCommand extends SlashCommand
 		getCommand().editCommand()
 				.addOption(OptionType.USER,"user", "The user you want to ban", true)
 				.addOption(OptionType.STRING, "reason", "Why you want to ban this user.", true)
-				.addOption(OptionType.INTEGER, "time", "The duration of the Ban in minutes.", false)
+				.addOption(OptionType.INTEGER, "time", "The duration of the Ban in minutes.", true)
 				.queue();
 	}
 
@@ -45,9 +45,9 @@ public class BanCommand extends SlashCommand
 		}
 
 
-		int caseid = bot.getPunishManager().banUser(command.getGuild(), target.getUser(), (int) command.getOption("time").getAsLong(), command.getOption("reason").getAsString());
+		int caseid = bot.getPunishManager().banUser(command.getGuild(), target.getUser(), (int) command.getOption("time").getAsLong(), command.getOption("reason").getAsString(), command.getMember());
 		command.getHook().sendMessageEmbeds(
-				Embed.user(Color.GREEN,"✅ **Case** " + caseid + "closed!\n" + target.getUser().getName() + " has been banned!", target.getUser()))
+				Embed.user(Color.GREEN,"✅ **Case** " + caseid + " closed!\n" + target.getUser().getName() + " has been banned!", target.getUser()))
 				.queue();
 
 	}

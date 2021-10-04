@@ -21,7 +21,7 @@ public class ReactionRoleManager extends ListenerAdapter {
 
 
 
-	public void addReactionRole(Role role, String emoji, Message message, TextChannel channel) {
+	public void addReactionRole(Role role, String emoji, Message message, MessageChannel channel) {
 		bot.getConfig().getRrconfig().set(channel.getIdLong() + "." + message.getIdLong() + "." + emoji, role.getIdLong());
 		bot.getConfig().save();
 		message.addReaction(emoji).queue();
@@ -29,7 +29,7 @@ public class ReactionRoleManager extends ListenerAdapter {
 
 
 
-	public void removeReactionRole(TextChannel channel, Message message, String emoji) {
+	public void removeReactionRole(MessageChannel channel, Message message, String emoji) {
 		bot.getConfig().getRrconfig().getConfigurationSection(channel.getIdLong() + "." + message.getIdLong()).getKeys(false).remove(emoji);
 		bot.getConfig().save();
 		message.clearReactions(emoji).queue();

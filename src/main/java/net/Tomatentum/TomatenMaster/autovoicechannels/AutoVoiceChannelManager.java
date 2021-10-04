@@ -91,16 +91,17 @@ public class AutoVoiceChannelManager extends ListenerAdapter {
 				e.getGuild().kickVoiceMember(e.getMember()).queue();
 				e.getMember().getUser().openPrivateChannel().complete().sendMessage("***Max Sessions reached***").queue();
 			}
+		}else if (channel.getIdLong() == 873558807979106326L) {
+			new PrivateVoiceChannel(e.getMember(), e.getChannelJoined().getParent()).create();
+
 		}else if (bot.getAutoVoiceChannelManager().getTempChannels().contains(e.getChannelLeft().getIdLong()) || e.getChannelLeft().getName().contains("'s Room")) {
 			if (e.getChannelLeft().getMembers().size() <= 0) {
 				bot.getAutoVoiceChannelManager().removeTempChannel(e.getChannelLeft());
-			}else {
+			} else {
 				if (bot.getAutoVoiceChannelManager().getTempChannels().contains(e.getChannelLeft().getIdLong())) {
 					bot.getAutoVoiceChannelManager().renameChannel(e.getChannelLeft(), e.getMember());
 				}
 			}
-		}else if (channel.getIdLong() == 873558807979106326L) {
-			new PrivateVoiceChannel(e.getMember(), e.getChannelJoined().getParent()).create();
 		}
 	}
 

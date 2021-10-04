@@ -2,47 +2,41 @@ package net.Tomatentum.TomatenMaster.commands;
 
 import net.Tomatentum.TomatenMaster.util.GuildCommand;
 import net.Tomatentum.TomatenMaster.TomatenMaster;
+import net.Tomatentum.TomatenMaster.util.SlashCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import java.util.concurrent.TimeUnit;
 
-public class TicketAddCommand implements GuildCommand {
+public class TicketAddCommand extends SlashCommand {
 	private TomatenMaster bot;
 	public TicketAddCommand(TomatenMaster bot) {
+		super("add", "Adds a Member to the current Ticket.", Permission.MANAGE_ROLES);
 		this.bot = bot;
+
+		getCommand().editCommand()
+				.addOption(OptionType.USER, "member", "The Member to be added", true)
+				.queue();
 	}
 	@Override
-	public void onCommand(Member member, TextChannel channel, Message msg, String[] args) {
-		msg.delete().complete();
-		channel.sendTyping().complete();
-		if (bot.getTicketManager().getOpenTickets().containsKey(channel)) {
-			if (args.length > 1) {
-				Member target = msg.getMentionedMembers().get(0);
+	public void execute(SlashCommandEvent command) {
+		if (bot.getTicketManager().getOpenTickets().containsKey(command.getTextChannel())) {
+				Member target = command.getOption("member").getAsMember();
+				TextChannel channel = command.getTextChannel();
+
 				if (!bot.getTicketManager().getOpenTickets().get(channel).getMembers().contains(target)) {
 					bot.getTicketManager().getOpenTickets().get(channel).addMember(target);
-					EmbedBuilder builder = new EmbedBuilder();
-					builder.setDescription("Member " + target.getAsMention() + " added!");
-					builder.setColor(0x00fc15);
-					channel.sendMessage(builder.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
-					builder.clear();
+					command.reply("✔ " + target.getAsMention() + " added!").setEphemeral(true).queue();
 				}else {
-					EmbedBuilder builder = new EmbedBuilder();
-					builder.setColor(0xff0000);
-					builder.setDescription(target.getAsMention() + " already is in this Ticket!");
-					channel.sendMessage(builder.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
-					builder.clear();
+					command.reply("❌ " + target.getAsMention() + " already added!").setEphemeral(true).queue();
 				}
-			}
 		}else {
-			EmbedBuilder builder = new EmbedBuilder();
-			builder.setTitle("Not available");
-			builder.setColor(0xfc0307);
-			builder.setDescription("The Command is not available in this channel.\nIt is only available in open tickets");
-			channel.sendMessage(builder.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
-			builder.clear();
+			command.reply("❌ Not available here!").setEphemeral(true).queue();;
 		}
 	}
 }

@@ -40,7 +40,7 @@ public class UnmuteCommand extends SlashCommand {
 			return;
 		}
 
-			int caseid = punishManager.unmuteMember(target);
+			int caseid = punishManager.unmuteMember(target, command.getMember());
 			command.getHook().sendMessageEmbeds(Embed.simple(
 							Color.GREEN,
 							"✅ **Case** " + caseid + " updated!\n**" + target.getAsMention() + "** unmuted"))

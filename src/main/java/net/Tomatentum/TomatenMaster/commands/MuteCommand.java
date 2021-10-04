@@ -40,7 +40,7 @@ public class MuteCommand extends SlashCommand {
 
 
 		if (command.getOption("time") == null) {
-				int caseid = bot.getPunishManager().muteMember(target, 30, /*TODO*/command.getOption("reason").getAsString());
+				int caseid = bot.getPunishManager().muteMember(target, 30, command.getOption("reason").getAsString(), command.getMember());
 
 				command.getHook().sendMessageEmbeds(Embed.simple(
 								Color.GREEN,
@@ -50,7 +50,7 @@ public class MuteCommand extends SlashCommand {
 
 		}else {
 					int time = Integer.parseInt(command.getOption("time").getAsString());
-						int caseid = bot.getPunishManager().muteMember(target, time, command.getOption("reason").getAsString());
+						int caseid = bot.getPunishManager().muteMember(target, time, command.getOption("reason").getAsString(), command.getMember());
 
 						command.getHook().sendMessageEmbeds(Embed.simple(
 										Color.GREEN,

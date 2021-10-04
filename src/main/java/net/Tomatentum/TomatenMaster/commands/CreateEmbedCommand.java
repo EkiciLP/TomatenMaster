@@ -2,44 +2,52 @@ package net.Tomatentum.TomatenMaster.commands;
 
 import net.Tomatentum.TomatenMaster.util.GuildCommand;
 import net.Tomatentum.TomatenMaster.TomatenMaster;
+import net.Tomatentum.TomatenMaster.util.SlashCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import java.awt.*;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
-public class CreateEmbedCommand implements GuildCommand {
+public class CreateEmbedCommand extends SlashCommand {
 	private TomatenMaster bot;
 	public CreateEmbedCommand(TomatenMaster bot) {
+		super("createembed", "Create a new embed.", Permission.MESSAGE_MANAGE);
 		this.bot = bot;
+
+		getCommand().editCommand()
+				.addOption(OptionType.CHANNEL, "channel", "The MessageChannel in which the embed should be sent to.", true)
+				.addOption(OptionType.STRING, "title", "The title of the embed.", true)
+
+				.queue();
 	}
 
 	@Override
-	public void onCommand(Member member, TextChannel channel, Message msg, String[] args) {
-		channel.sendTyping().complete();
-		msg.delete().queue();
-		if (member.hasPermission(Permission.MESSAGE_MANAGE)) {
-			if (args.length == 3) {
+	public void execute(SlashCommandEvent command) {
 			/*
 			arg1 = channel
 			arg2 = Title
 			 */
-				EmbedBuilder builder = new EmbedBuilder();
-				builder.setTitle(args[2]);
-				TextChannel EmbedChannel = msg.getMentionedChannels().get(0);
-				bot.getEmbedManager().createEmbed(builder, EmbedChannel);
-				msg.addReaction("✔").queue();
-			} else
-				channel.sendMessage(new EmbedBuilder().setDescription("Usage >> !createembed <channel> <Title>").setColor(0xfc0307).build()).queue();
-		}else {
 
-			EmbedBuilder builder = new EmbedBuilder();
-			builder.setTitle("No Permission for Command: !createembed");
-			builder.setColor(Color.RED);
-			channel.sendMessage(builder.build()).complete().delete().queueAfter(10, TimeUnit.SECONDS);
+		MessageChannel channel;
+
+		try {
+			channel = command.getOption("channel").getAsMessageChannel();
+		}catch (NullPointerException ex) {
+			command.reply("❌ Please specify a message channel.").queue();
+			return;
 		}
+
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.setTitle(command.getOption("title").getAsString());
+		bot.getEmbedManager().createEmbed(builder, (TextChannel) channel);
+		command.reply("✍ Embed created!").setEphemeral(true).queue();
 	}
 }

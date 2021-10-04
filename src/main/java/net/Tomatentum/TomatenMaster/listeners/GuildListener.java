@@ -24,28 +24,14 @@ public class GuildListener extends ListenerAdapter {
 	}
 
 	@Override
-	public void onGuildBan(@NotNull GuildBanEvent event) {
-		bot.getPunishManager().banUser(event.getGuild(), event.getUser(), 2147483647, "Discord Ban");
-	}
-
-	@Override
-	public void onGuildUnban(@NotNull GuildUnbanEvent event) {
-		bot.getPunishManager().unBanUser(event.getUser(), event.getGuild());
-	}
-
-	@Override
 	public void onGuildMemberRoleAdd(@NotNull GuildMemberRoleAddEvent event) {
 		if (event.getRoles().contains(event.getGuild().getRolesByName("muted", true).get(0))) {
-			bot.getPunishManager().muteMember(event.getMember(), 30, "Via Discord Role muted");
+			for (Role role : event.getRoles()) {
+				event.getGuild().removeRoleFromMember(event.getMember(), role).queue();
+			}
 		}
 	}
 
-	@Override
-	public void onGuildMemberRoleRemove(@NotNull GuildMemberRoleRemoveEvent event) {
-		if (event.getRoles().contains(event.getGuild().getRolesByName("muted", true).get(0))) {
-			bot.getPunishManager().unmuteMember(event.getMember());
-		}
-	}
 
 	@Override
 	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
@@ -64,25 +50,27 @@ public class GuildListener extends ListenerAdapter {
 			EmbedBuilder builder = new EmbedBuilder();
 			builder.setColor(Color.GREEN);
 			builder.setAuthor(event.getUser().getName(), null, event.getMember().getUser().getAvatarUrl());
-			builder.setImage(event.getGuild().getSplashUrl());
 			builder.setTimestamp(OffsetDateTime.now());
 			builder.setTitle("Welcome " + event.getMember().getEffectiveName());
 			builder.setDescription("Hello " + event.getUser().getAsMention() + " and welcome to the TomatenTum Network!\n" +
 					"We are currently working on our Minecraft Network so chill out on the discord and wait for us :p" );
-			channel.sendMessage("").setEmbeds(builder.build()).queue();
+			channel.sendMessage(" ").setEmbeds(builder.build()).queue();
 			builder.clear();
 		}else {
 			bot.getConfig().getYML().set("WelcomeChannel", null);
 			bot.getConfig().save();
 			System.out.println("No Welcome Channel has been set!");
 		}
+
+
+		if (bot.getPunishManager().isMuted(event.getMember()))
+			event.getGuild().addRoleToMember(event.getMember(), bot.getPunishManager().getMutedRole(event.getGuild())).queue();
 	}
 
 	@Override
 	public void onGuildMemberRemove(@NotNull GuildMemberRemoveEvent event) {
 		TextChannel channel = event.getGuild().getTextChannelById(bot.getConfig().getYML().getLong("WelcomeChannel"));
 		if (channel != null) {
-
 			channel.sendMessage(" ").setEmbeds(Embed.user(Color.ORANGE, "Bye " + event.getUser().getName(), event.getMember().getUser())).queue();
 		}else {
 			bot.getConfig().getYML().set("WelcomeChannel", null);

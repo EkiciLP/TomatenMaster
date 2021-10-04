@@ -13,6 +13,8 @@ public class TicketManager {
 	private HashMap<TextChannel, Ticket> openTickets;
 	public List<Member> ownerlist;
 	private HashMap<TextChannel, Ticket> closedTickets;
+
+
 	public TicketManager(TomatenMaster bot) {
 		this.bot = bot;
 		this.openTickets = new HashMap<>();

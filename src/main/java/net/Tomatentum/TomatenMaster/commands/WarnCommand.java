@@ -2,21 +2,15 @@ package net.Tomatentum.TomatenMaster.commands;
 
 
 import net.Tomatentum.TomatenMaster.util.Embed;
-import net.Tomatentum.TomatenMaster.util.GuildCommand;
 import net.Tomatentum.TomatenMaster.TomatenMaster;
 import net.Tomatentum.TomatenMaster.util.SlashCommand;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.privileges.CommandPrivilege;
 
 import java.awt.*;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+
 
 public class WarnCommand extends SlashCommand {
 	private TomatenMaster bot;
@@ -35,7 +29,7 @@ public class WarnCommand extends SlashCommand {
 	public void execute(SlashCommandEvent command) {
 		command.deferReply(true).queue();
 		Member target = command.getOption("member").getAsMember();
-		int caseid = bot.getPunishManager().addWarning(target, command.getOption("reason").getAsString());
+		int caseid = bot.getPunishManager().addWarning(target, command.getOption("reason").getAsString(), command.getMember());
 
 		command.getHook().sendMessageEmbeds(Embed.simple(
 						Color.GREEN,

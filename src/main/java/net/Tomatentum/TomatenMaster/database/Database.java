@@ -1,19 +1,23 @@
 package net.Tomatentum.TomatenMaster.database;
 
+import net.Tomatentum.TomatenMaster.TomatenMaster;
+
 import java.sql.*;
 
 public class Database{
 
-	private static final String database = "sus";
-	private static final String user = "no";
-	private static final String password = "you";
+	private static final String database = TomatenMaster.getINSTANCE().getConfig().getYML().getString("db");
+	private static final String user = TomatenMaster.getINSTANCE().getConfig().getYML().getString("dbuser");
+	private static final String password = TomatenMaster.getINSTANCE().getConfig().getYML().getString("dbpassword");
+	private static final String host = TomatenMaster.getINSTANCE().getConfig().getYML().getString("dbhost");
 
 	private static Connection connection;
 
 	static {
 		try {
-			connection = DriverManager.getConnection("jdbc:mysql://116.202.92.16:3306/" + database + "?useSSL=false", user, password);
-		} catch (SQLException e) {
+			Class.forName("com.mysql.jdbc.Driver");
+			connection = DriverManager.getConnection("jdbc:mysql://" + host + "/" + database + "?useSSL=false", user, password);
+		} catch (SQLException | ClassNotFoundException e) {
 			e.printStackTrace();
 		}
 	}

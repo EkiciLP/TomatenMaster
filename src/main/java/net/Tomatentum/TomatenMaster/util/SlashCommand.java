@@ -19,7 +19,7 @@ public abstract class SlashCommand extends ListenerAdapter {
 	private Command command;
 	private Permission[] permissions;
 
-	protected SlashCommand(String label, String description, Permission... permissions) {
+	protected SlashCommand(String label, String description, @NotNull Permission... permissions) {
 		for (Guild guild : TomatenMaster.getINSTANCE().getBot().getGuilds()) {
 			this.command = guild.upsertCommand(label, description).setDefaultEnabled(true).complete();
 		}
@@ -36,7 +36,9 @@ public abstract class SlashCommand extends ListenerAdapter {
 
 	@Override
 	public void onSlashCommand(@NotNull SlashCommandEvent event) {
+		System.out.println("|");
 		if (command.getName().equals(event.getName())) {
+			System.out.println("Ran Command >> " + event.getName());
 			for (Permission permission : permissions) {
 				if (event.getMember().hasPermission(permission)) {
 					execute(event);

@@ -8,19 +8,17 @@ import net.Tomatentum.TomatenMaster.util.CommandManager;
 import net.Tomatentum.TomatenMaster.commands.EditEmbedCommand;
 import net.Tomatentum.TomatenMaster.listeners.*;
 import net.Tomatentum.TomatenMaster.managers.*;
-import net.Tomatentum.TomatenMaster.music.AudioManager;
-import net.Tomatentum.TomatenMaster.music.commands.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 
 import javax.security.auth.login.LoginException;
-import javax.xml.crypto.Data;
 import java.util.Scanner;
 
 public class TomatenMaster {
@@ -34,7 +32,6 @@ public class TomatenMaster {
 	private final PunishManager punishManager;
 	private final ReactionRoleManager reactionRole;
 	private static TomatenMaster INSTANCE;
-	private final AudioManager audioManager;
 
 	public TomatenMaster() throws LoginException, InterruptedException {
 
@@ -56,6 +53,7 @@ public class TomatenMaster {
 		buildbot.enableCache(CacheFlag.VOICE_STATE);
 
 
+
 		bot = buildbot.build();
 		bot.awaitReady();
 		System.out.println("[TomatenMaster] initialized");
@@ -65,7 +63,6 @@ public class TomatenMaster {
 		embedManager = new EmbedManager(this);
 		punishManager = new PunishManager(this);
 		reactionRole = new ReactionRoleManager(this);
-		audioManager = new AudioManager(this);
 		protocolChannel = bot.getTextChannelById(835092656836050964L);
 
 
@@ -77,40 +74,27 @@ public class TomatenMaster {
 	}
 
 	private void registerCommands() {
-		cmdmanager.registerCommand("clear", new ClearCommand());
-		cmdmanager.registerCommand("panel",new PanelCommand(this));
-		cmdmanager.registerCommand("close", new CloseCommand(this));
-		cmdmanager.registerCommand("reopen", new ReOpenCommand(this));
-		cmdmanager.registerCommand("add", new TicketAddCommand(this));
-		cmdmanager.registerCommand("delete", new DeleteCommand());
-		cmdmanager.registerCommand("remove", new TicketRemoveCommand(this));
-		cmdmanager.registerCommand("createembed", new CreateEmbedCommand(this));
-		cmdmanager.registerCommand("editembed", new EditEmbedCommand(this));
-		cmdmanager.registerCommand("help", new HelpCommand(this));
-		cmdmanager.registerCommand("new", new NewTicketCommand(this));
-		cmdmanager.registerCommand("lock", new LockCommand());
-		cmdmanager.registerCommand("autorole", new AutoRoleCommand(this));
-		cmdmanager.registerCommand("welcome", new WelcomeCommand(this));
+		cmdmanager.registerCommand(new ClearCommand());
+		cmdmanager.registerCommand(new PanelCommand(this));
+		cmdmanager.registerCommand(new CloseCommand(this));
+		cmdmanager.registerCommand(new ReOpenCommand(this));
+		cmdmanager.registerCommand(new TicketAddCommand(this));
+		cmdmanager.registerCommand(new DeleteCommand());
+		cmdmanager.registerCommand(new TicketRemoveCommand(this));
+		cmdmanager.registerCommand(new CreateEmbedCommand(this));
+		cmdmanager.registerCommand(new EditEmbedCommand(this));
+		cmdmanager.registerCommand(new LockCommand());
 		cmdmanager.registerCommand(new WarnCommand(this));
 		cmdmanager.registerCommand(new WarningsCommand(this));
 		cmdmanager.registerCommand(new MuteCommand(this));
 		cmdmanager.registerCommand(new UnmuteCommand());
 		cmdmanager.registerCommand(new BanCommand(this));
-		cmdmanager.registerCommand("rr", new ReactionRoleCommand(this));
-		cmdmanager.registerCommand("shutdown", new ShutDownCommand(this));
-		cmdmanager.registerCommand("suggest", new SuggestCommand());
+		cmdmanager.registerCommand(new ClearWarningsCommand());
+		cmdmanager.registerCommand(new ReactionRoleCommand(this));
+		cmdmanager.registerCommand(new SuggestCommand());
 		cmdmanager.registerCommand(new ApproveCommand());
-		cmdmanager.registerCommand("reject", new RejectCommand());
-		cmdmanager.registerCommand("play", new PlayCommand());
-		cmdmanager.registerCommand("skip", new SkipCommand());
-		cmdmanager.registerCommand("clearqueue", new ClearQueueCommand());
-		cmdmanager.registerCommand("stop", new StopCommand());
-		cmdmanager.registerCommand("loop", new LoopCommand());
-		cmdmanager.registerCommand("shuffle", new ShuffleCommand());
-		cmdmanager.registerCommand("queue", new QueueCommand());
-		cmdmanager.registerCommand("volume", new VolumeCommand());
-		cmdmanager.registerCommand("pause", new PauseCommand());
-		cmdmanager.registerCommand("resume", new PauseCommand());
+		cmdmanager.registerCommand(new RejectCommand());
+
 	}
 
 
@@ -128,9 +112,6 @@ public class TomatenMaster {
 		Scanner scanner = new Scanner(System.in);
 		if (scanner.nextLine().equals("exit")) {
 
-			getAudioManager().getMusicManagers().forEach((guild, musicManager) ->
-					musicManager.getGuild().getAudioManager().closeAudioConnection()
-			);
 
 			bot.getPresence().setStatus(OnlineStatus.OFFLINE);
 			System.out.println("Bot offline");
@@ -190,10 +171,6 @@ public class TomatenMaster {
 
 	public static TomatenMaster getINSTANCE() {
 		return INSTANCE;
-	}
-
-	public AudioManager getAudioManager() {
-		return audioManager;
 	}
 
 

@@ -24,13 +24,19 @@ public class ApproveCommand extends SlashCommand {
 	}
 	@Override
 	public void execute(SlashCommandEvent command) {
-		command.deferReply(true).queue();
-		Suggestion suggestion = Suggestion.getSuggestionById((int) command.getOption("id").getAsLong());
+		Suggestion suggestion;
+		try {
+			suggestion = Suggestion.getSuggestionById((int) command.getOption("id").getAsLong());
+		}catch (NullPointerException ex) {
+			command.reply("❌ Invalid suggestion ID").setEphemeral(true).queue();
+			return;
+		}
+
 		if (suggestion != null) {
 			suggestion.approve();
-			command.getHook().sendMessage("✅ Suggestion **" + command.getOption("id").getAsString() + "** approved!").setEphemeral(true).queue();
+			command.reply("✔ Suggestion ***" + command.getOption("id").getAsString() + "*** was approved!").setEphemeral(true).queue();
 		}else {
-			command.getHook().sendMessage("❎ Suggestion **" + command.getOption("id").getAsString() + "** not existing!").setEphemeral(true).queue();
+			command.reply("❌ Invalid suggestion ID").setEphemeral(true).queue();
 
 		}
 	}
