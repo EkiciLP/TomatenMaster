@@ -3,11 +3,9 @@ package net.Tomatentum.TomatenMaster.util;
 import net.Tomatentum.TomatenMaster.TomatenMaster;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.Command;
-import net.dv8tion.jda.api.interactions.commands.privileges.CommandPrivilege;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -36,7 +34,6 @@ public abstract class SlashCommand extends ListenerAdapter {
 
 	@Override
 	public void onSlashCommand(@NotNull SlashCommandEvent event) {
-		System.out.println("|");
 		if (command.getName().equals(event.getName())) {
 			System.out.println("Ran Command >> " + event.getName());
 			for (Permission permission : permissions) {

@@ -1,20 +1,15 @@
 package net.Tomatentum.TomatenMaster.commands;
 
 import net.Tomatentum.TomatenMaster.TomatenMaster;
-import net.Tomatentum.TomatenMaster.managers.PunishManager;
+import net.Tomatentum.TomatenMaster.punishments.PunishManager;
 import net.Tomatentum.TomatenMaster.util.Embed;
 import net.Tomatentum.TomatenMaster.util.SlashCommand;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.privileges.CommandPrivilege;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class UnmuteCommand extends SlashCommand {
 

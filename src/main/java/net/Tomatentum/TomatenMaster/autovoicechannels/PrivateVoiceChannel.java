@@ -129,9 +129,11 @@ public class PrivateVoiceChannel extends ListenerAdapter implements VoiceChannel
 
 	@Override
 	public void onGuildVoiceLeave(@NotNull GuildVoiceLeaveEvent event) {
-		if (event.getChannelLeft().getIdLong() == channel.getIdLong()) {
+		VoiceChannel channel = event.getChannelLeft();
+
+		if (channel.getIdLong() == this.channel.getIdLong()) {
 			removeMember(event.getMember());
-			if (event.getChannelLeft().getMembers().size() == 0) {
+			if (channel.getMembers().size() == 0) {
 				delete().queue();
 				return;
 			}

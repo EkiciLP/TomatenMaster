@@ -1,18 +1,10 @@
 package net.Tomatentum.TomatenMaster.commands;
 
-import net.Tomatentum.TomatenMaster.util.GuildCommand;
 import net.Tomatentum.TomatenMaster.managers.Suggestion;
 import net.Tomatentum.TomatenMaster.util.SlashCommand;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-
-import java.awt.*;
-import java.util.concurrent.TimeUnit;
 
 public class ApproveCommand extends SlashCommand {
 

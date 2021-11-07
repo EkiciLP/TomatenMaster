@@ -107,11 +107,11 @@ public class RequestMessage extends ListenerAdapter {
 		if (event.getChannelLeft().getIdLong() == pvc.getWaitChannel().getIdLong()) {
 			if (event.getMember().getIdLong() == memberId) {
 
-				if (event.getChannelLeft().getIdLong() == pvc.getIdLong())
-					return;
-
 				remove();
 			}
+		}else if (event.getChannelJoined().getIdLong() == pvc.getIdLong()) {
+			if (accepted)
+				remove();
 		}
 	}
 
@@ -119,13 +119,11 @@ public class RequestMessage extends ListenerAdapter {
 	public void onGuildVoiceMove(@NotNull GuildVoiceMoveEvent event) {
 		if (event.getChannelLeft().getIdLong() == pvc.getWaitChannel().getIdLong()) {
 			if (event.getMember().getIdLong() == memberId) {
-
-				if (event.getChannelJoined().getIdLong() == pvc.getIdLong())
-					return;
-
 				remove();
-
 			}
+		}else if (event.getChannelJoined().getIdLong() == pvc.getIdLong()) {
+			if (accepted)
+				remove();
 		}
 	}
 

@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 
 import java.awt.*;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 
 public class Embed {
@@ -16,6 +17,15 @@ public class Embed {
 		builder.setColor(color);
 		builder.setDescription(text);
 		builder.setTimestamp(OffsetDateTime.now());
+		return builder.build();
+	}
+
+	public static MessageEmbed timer(Color color, String text, String title, long endTime) {
+
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.setColor(color);
+		builder.setDescription(text);
+		builder.setTimestamp(Instant.ofEpochMilli(endTime));
 		return builder.build();
 	}
 

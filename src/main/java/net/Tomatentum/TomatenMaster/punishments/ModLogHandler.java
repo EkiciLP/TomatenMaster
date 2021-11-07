@@ -1,4 +1,4 @@
-package net.Tomatentum.TomatenMaster.managers;
+package net.Tomatentum.TomatenMaster.punishments;
 
 import net.Tomatentum.TomatenMaster.TomatenMaster;
 import net.Tomatentum.TomatenMaster.util.Embed;
@@ -33,7 +33,15 @@ public class ModLogHandler {
 			logType = LogType.WARN;
 		}
 
-		String finalText = logType.getText().replace("{@target}", punishment.getUser().getAsMention()).replace("{@mod}", moderator.getAsMention()).replace("{reason}", punishment.getReason()).replace("{caseid}", String.valueOf(punishment.getCaseId()));
+		System.out.println(punishment.getUser());
+		System.out.println(punishment.getCaseType());
+		System.out.println(punishment.getCaseId());
+		System.out.println(punishment.getGuild());
+		System.out.println(punishment.isActive());
+		System.out.println(punishment.getReason());
+
+
+		String finalText = logType.getText().replace("{@target}", "***" + punishment.getUser().getName() + "***").replace("{@mod}", moderator.getAsMention()).replace("{reason}", punishment.getReason()).replace("{caseid}", String.valueOf(punishment.getCaseId()));
 		MessageEmbed embed = Embed.log(logType.getColor(), finalText, punishment.getUser());
 
 		logChannel.sendMessageEmbeds(embed).queue();

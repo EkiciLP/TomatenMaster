@@ -1,4 +1,4 @@
-package net.Tomatentum.TomatenMaster.commands;
+package net.Tomatentum.TomatenMaster.commands.ticket;
 
 import net.Tomatentum.TomatenMaster.managers.Ticket;
 import net.Tomatentum.TomatenMaster.util.GuildCommand;

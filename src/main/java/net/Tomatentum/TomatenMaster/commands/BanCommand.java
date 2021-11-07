@@ -1,18 +1,14 @@
 package net.Tomatentum.TomatenMaster.commands;
 
 import net.Tomatentum.TomatenMaster.util.Embed;
-import net.Tomatentum.TomatenMaster.util.GuildCommand;
 import net.Tomatentum.TomatenMaster.TomatenMaster;
 import net.Tomatentum.TomatenMaster.util.SlashCommand;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
-import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import java.awt.*;
-import java.util.concurrent.TimeUnit;
 
 public class BanCommand extends SlashCommand
 {

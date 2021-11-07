@@ -1,9 +1,14 @@
 package net.Tomatentum.TomatenMaster;
 
 import net.Tomatentum.TomatenMaster.autovoicechannels.AutoVoiceChannelManager;
+import net.Tomatentum.TomatenMaster.commands.ticket.CloseCommand;
+import net.Tomatentum.TomatenMaster.commands.ticket.ReOpenCommand;
+import net.Tomatentum.TomatenMaster.commands.ticket.TicketAddCommand;
+import net.Tomatentum.TomatenMaster.commands.ticket.TicketRemoveCommand;
 import net.Tomatentum.TomatenMaster.database.Database;
 import net.Tomatentum.TomatenMaster.managers.TicketManager;
 import net.Tomatentum.TomatenMaster.commands.*;
+import net.Tomatentum.TomatenMaster.punishments.PunishManager;
 import net.Tomatentum.TomatenMaster.util.CommandManager;
 import net.Tomatentum.TomatenMaster.commands.EditEmbedCommand;
 import net.Tomatentum.TomatenMaster.listeners.*;
@@ -12,7 +17,6 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.hooks.AnnotatedEventManager;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
@@ -95,6 +99,7 @@ public class TomatenMaster {
 		cmdmanager.registerCommand(new ApproveCommand());
 		cmdmanager.registerCommand(new RejectCommand());
 
+
 	}
 
 
@@ -122,17 +127,7 @@ public class TomatenMaster {
 		}
 	}
 
-	public static String getTimestamp(long milliseconds)
-	{
-		int seconds = (int) (milliseconds / 1000) % 60 ;
-		int minutes = (int) ((milliseconds / (1000 * 60)) % 60);
-		int hours   = (int) ((milliseconds / (1000 * 60 * 60)) % 24);
 
-		if (hours > 0)
-			return String.format("%02d:%02d:%02d", hours, minutes, seconds);
-		else
-			return String.format("%02d:%02d", minutes, seconds);
-	}
 
 	//getters/setters
 

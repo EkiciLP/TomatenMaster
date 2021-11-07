@@ -30,20 +30,17 @@ public class ClearCommand extends SlashCommand {
 
 		command.deferReply(true).queue();
 		TextChannel channel = command.getTextChannel();
-				List<Message> messages = getChannelHistory(channel, (int) command.getOption("amount").getAsLong()+1);
-				int msgcount = messages.size()-1;
-				channel.purgeMessages(messages);
-				command.getHook().setEphemeral(true).sendMessage("```\nDeleted " + msgcount + " Messages\n```").queue();
+		List<Message> messages = getChannelHistory(channel, (int) command.getOption("amount").getAsLong());
+		channel.purgeMessages(messages);
+		command.getHook().setEphemeral(true).sendMessage("```\nDeleted " + messages.size() + " Messages\n```").queue();
 
 	}
 	public List<Message> getChannelHistory(TextChannel channel, int number) {
 		List<Message> messages = new ArrayList<>();
-		int counter = 0;
 		for (Message msg : channel.getIterableHistory()) {
 			if (!msg.isPinned()) {
-				if (counter < number) {
+				if (messages.size() < number) {
 					messages.add(msg);
-					counter++;
 				}
 			}
 		}

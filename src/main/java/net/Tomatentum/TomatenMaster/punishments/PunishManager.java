@@ -1,4 +1,4 @@
-package net.Tomatentum.TomatenMaster.managers;
+package net.Tomatentum.TomatenMaster.punishments;
 
 import net.Tomatentum.TomatenMaster.TomatenMaster;
 import net.Tomatentum.TomatenMaster.database.Database;
@@ -42,7 +42,7 @@ public class PunishManager {
 									unmuteMember(bot.getBot().getGuildById(resultSet.getLong("guildid")).getMemberById(resultSet.getLong("userid")), bot.getBot().getGuildById(resultSet.getLong("guildid")).getSelfMember());
 									break;
 								case BAN:
-									unBanUser(bot.getBot().getUserById(resultSet.getLong("userid")), bot.getBot().getGuildById(resultSet.getLong("guildid")), bot.getBot().getGuildById(resultSet.getLong("guildid")).getSelfMember());
+									unBanUser(bot.getBot().retrieveUserById(resultSet.getLong("userid")).complete(), bot.getBot().getGuildById(resultSet.getLong("guildid")), bot.getBot().getGuildById(resultSet.getLong("guildid")).getSelfMember());
 									break;
 							}
 						}
@@ -157,6 +157,10 @@ public class PunishManager {
 
 	public int unBanUser(User user, Guild guild, Member moderator) {
 
+		System.out.println(user);
+		System.out.println(guild);
+		System.out.println(moderator);
+
 		ResultSet resultSet = Database.executeQuery("SELECT * FROM punishments WHERE userid=" + user.getIdLong() + " && casetype='" + CaseType.BAN +
 				"' && guildid=" + guild.getIdLong() + " && active=true");
 
@@ -270,53 +274,3 @@ public class PunishManager {
 
 }
 
-enum CaseType {
-	BAN,
-	MUTE,
-	WARNING;
-
-}
-
-class Punishment {
-	private final int caseId;
-	private final long guildId;
-	private final long userId;
-	private final String reason;
-	private final boolean active;
-	private final CaseType caseType;
-
-
-	Punishment(int caseId, long guildid, long userid, String reason, boolean active, String caseType) {
-		this.caseId = caseId;
-		this.guildId = guildid;
-		this.userId = userid;
-		this.reason = reason;
-		this.active = active;
-		this.caseType = CaseType.valueOf(caseType);
-
-	}
-
-	public int getCaseId() {
-		return caseId;
-	}
-
-	public Guild getGuild() {
-		return TomatenMaster.getINSTANCE().getBot().getGuildById(guildId);
-	}
-
-	public User getUser() {
-		return TomatenMaster.getINSTANCE().getBot().getUserById(userId);
-	}
-
-	public String getReason() {
-		return reason;
-	}
-
-	public CaseType getCaseType() {
-		return caseType;
-	}
-
-	public boolean isActive() {
-		return active;
-	}
-}
