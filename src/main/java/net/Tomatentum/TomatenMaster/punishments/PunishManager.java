@@ -17,7 +17,7 @@ import java.util.List;
 
 public class PunishManager {
 	private final TomatenMaster bot;
-	private String mutedRoleName = "muted";
+	private final String mutedRoleName = "muted";
 
 	public PunishManager(TomatenMaster bot) {
 		this.bot = bot;
@@ -116,7 +116,9 @@ public class PunishManager {
 				"WHERE userid=" + member.getIdLong() + " && guildid=" + member.getGuild().getIdLong() + " && caseType='" + CaseType.MUTE + "' && active=true");
 
 		try {
-			resultSet.next();
+			if (resultSet != null) {
+				resultSet.next();
+			}
 
 			return resultSet.getInt(1) != 0;
 		} catch (SQLException e) {

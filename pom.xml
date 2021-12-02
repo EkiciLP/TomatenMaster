@@ -44,11 +44,13 @@
             <artifactId>JDA</artifactId>
             <version>4.3.0_324</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.bspfsystems/yamlconfiguration -->
         <dependency>
             <groupId>org.bspfsystems</groupId>
             <artifactId>yamlconfiguration</artifactId>
-            <version>1.0.9-SNAPSHOT</version>
+            <version>1.0.4</version>
         </dependency>
+
         <dependency>
             <groupId>com.sedmelluq</groupId>
             <artifactId>lavaplayer</artifactId>

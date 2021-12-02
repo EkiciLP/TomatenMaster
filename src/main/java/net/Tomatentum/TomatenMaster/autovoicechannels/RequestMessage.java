@@ -64,7 +64,7 @@ public class RequestMessage extends ListenerAdapter {
 		builder.setColor(Color.GREEN);
 		builder.setDescription("Hey " + pvc.getOwner().getAsMention() +
 				"!\n Click ❌ to kick " + getMember().getAsMention());
-		this.message = message.editMessage(builder.build()).setActionRow(approveButton.asDisabled(), rejectButton).complete();
+		this.message = message.editMessageEmbeds(builder.build()).setActionRow(approveButton.asDisabled(), rejectButton).complete();
 	}
 
 	public void reject() {
@@ -106,10 +106,10 @@ public class RequestMessage extends ListenerAdapter {
 	public void onGuildVoiceLeave(@NotNull GuildVoiceLeaveEvent event) {
 		if (event.getChannelLeft().getIdLong() == pvc.getWaitChannel().getIdLong()) {
 			if (event.getMember().getIdLong() == memberId) {
-
-				remove();
+				if (!accepted)
+					remove();
 			}
-		}else if (event.getChannelJoined().getIdLong() == pvc.getIdLong()) {
+		}else if (event.getChannelLeft().getIdLong() == pvc.getIdLong()) {
 			if (accepted)
 				remove();
 		}
@@ -119,7 +119,8 @@ public class RequestMessage extends ListenerAdapter {
 	public void onGuildVoiceMove(@NotNull GuildVoiceMoveEvent event) {
 		if (event.getChannelLeft().getIdLong() == pvc.getWaitChannel().getIdLong()) {
 			if (event.getMember().getIdLong() == memberId) {
-				remove();
+				if (!accepted)
+					remove();
 			}
 		}else if (event.getChannelJoined().getIdLong() == pvc.getIdLong()) {
 			if (accepted)
