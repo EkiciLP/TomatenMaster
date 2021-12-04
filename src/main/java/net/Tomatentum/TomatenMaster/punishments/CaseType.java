@@ -1,6 +1,6 @@
 package net.Tomatentum.TomatenMaster.punishments;
 
-enum
+public enum
 CaseType {
 	BAN,
 	MUTE,

@@ -119,7 +119,7 @@ public class PrivateVoiceChannel extends ListenerAdapter implements VoiceChannel
 
 	@Override
 	public void onGuildVoiceJoin(@NotNull GuildVoiceJoinEvent event) {
-		if (event.getChannelJoined().getIdLong() == (waitChannel.getIdLong())) {
+		if (event.getChannelJoined().getIdLong() == waitChannel.getIdLong()) {
 			RequestMessage requestMessage = new RequestMessage(event.getMember().getIdLong(), this);
 			this.requestMessages.add(requestMessage);
 			requestMessage.send();
@@ -154,7 +154,7 @@ public class PrivateVoiceChannel extends ListenerAdapter implements VoiceChannel
 			}
 
 			if (event.getMember().getIdLong() == owner.getIdLong()) {
-				setOwner(event.getChannelLeft().getMembers().get(0));
+				setOwner(channel.getMembers().get(0));
 			}
 		}
 

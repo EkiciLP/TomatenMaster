@@ -91,13 +91,18 @@ public class RequestMessage extends ListenerAdapter {
 	public void onButtonClick(@NotNull ButtonClickEvent event) {
 		if (event.getMessage().getIdLong() == message.getIdLong()) {
 			if (event.getButton().equals(approveButton)) {
-				if (!event.getButton().isDisabled())
+				if (!event.getButton().isDisabled()) {
 					accept();
+					event.reply(getMember().getAsMention() + " has been accepted!").setEphemeral(true);
+				}
 			}else {
 				if (accepted) {
 					remove();
-				} else
+					event.reply(getMember().getAsMention() + " has been kicked!").setEphemeral(true);
+				} else {
 					reject();
+					event.reply(getMember().getAsMention() + " has been rejected!").setEphemeral(true);
+				}
 			}
 		}
 	}

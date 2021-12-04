@@ -16,7 +16,7 @@ public class ModLogHandler {
 	private final TextChannel logChannel = bot.getProtocolChannel();
 
 	public void log(int caseid, Member moderator) {
-		Punishment punishment = bot.getPunishManager().getPunishment(caseid);
+		Punishment punishment = Punishment.getPunishment(caseid);
 		LogType logType;
 
 		if (punishment.getCaseType().equals(CaseType.BAN)) {

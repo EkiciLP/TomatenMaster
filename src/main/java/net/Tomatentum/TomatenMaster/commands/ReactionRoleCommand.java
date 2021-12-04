@@ -23,7 +23,7 @@ public class ReactionRoleCommand extends SlashCommand {
 				.addSubcommands(
 						new SubcommandData("add", "Adds a reaction role")
 						.addOption(OptionType.CHANNEL, "channel", "The channel of the message",true)
-						.addOption(OptionType.NUMBER, "messageid", "The MessageID of the message where the reaction role should be added.", true)
+						.addOption(OptionType.STRING, "messageid", "The MessageID of the message where the reaction role should be added.", true)
 						.addOption(OptionType.STRING, "emoji", "The emoji of the reaction role", true)
 						.addOption(OptionType.ROLE, "role", "The role of the reaction role", true),
 						new SubcommandData("remove", "Removes a reaction role")
@@ -47,6 +47,14 @@ public class ReactionRoleCommand extends SlashCommand {
 				MessageChannel channel = command.getOption("channel").getAsMessageChannel();
 				Message message;
 				String emoji = command.getOption("emoji").getAsString();
+
+				long messageId;
+
+				try {
+					messageId = Long.parseLong(command.getOption("messageid").getAsString());
+				}catch (NumberFormatException exception) {
+					command.reply("❌ Character in messageid found! Only use the number you copied with (Copy id) on your message").setEphemeral(true).queue();
+				}
 
 				try {
 					message = channel.retrieveMessageById(command.getOption("messageid").getAsLong()).complete();

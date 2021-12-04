@@ -3,10 +3,7 @@ package net.Tomatentum.TomatenMaster.punishments;
 import net.Tomatentum.TomatenMaster.TomatenMaster;
 import net.Tomatentum.TomatenMaster.database.Database;
 import net.Tomatentum.TomatenMaster.util.Embed;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 
 import java.awt.*;
 import java.sql.ResultSet;
@@ -21,10 +18,8 @@ public class PunishManager {
 
 	public PunishManager(TomatenMaster bot) {
 		this.bot = bot;
-
-
 		Database.executeUpdate("CREATE TABLE IF NOT EXISTS punishments" +
-				"(caseid int PRIMARY KEY AUTO_INCREMENT, caseType varchar(7), guildid BIGINT, userid BIGINT, expiryDate BIGINT, reason varchar(400), active BOOLEAN)");
+				"(caseid int PRIMARY KEY AUTO_INCREMENT, caseType varchar(7), guildid BIGINT, userid BIGINT, expiryDate BIGINT, reason varchar(400), active BOOLEAN, moderatorid BIGINT, punishTime BIGINT)");
 
 		new Timer().schedule(new TimerTask() {
 			@Override
@@ -35,14 +30,22 @@ public class PunishManager {
 						if (resultSet.getString("caseType").equals(CaseType.WARNING)) {
 							continue;
 						}
+						long endTime = resultSet.getLong("expiryDate");
+						if (resultSet.wasNull()) {
+							return;
+						}
 
-						if (resultSet.getLong("expiryDate") <= System.currentTimeMillis()) {
+						Guild guild = bot.getBot().getGuildById(resultSet.getLong("guildid"));
+						User user = bot.getBot().getUserById(resultSet.getLong("userid"));
+						if (endTime <= System.currentTimeMillis()) {
 							switch (CaseType.valueOf(resultSet.getString("CaseType"))) {
 								case MUTE:
-									unmuteMember(bot.getBot().getGuildById(resultSet.getLong("guildid")).getMemberById(resultSet.getLong("userid")), bot.getBot().getGuildById(resultSet.getLong("guildid")).getSelfMember());
+
+									Member member = guild.getMemberById(user.getIdLong());
+									unmuteMember(member, guild.getSelfMember());
 									break;
 								case BAN:
-									unBanUser(bot.getBot().retrieveUserById(resultSet.getLong("userid")).complete(), bot.getBot().getGuildById(resultSet.getLong("guildid")), bot.getBot().getGuildById(resultSet.getLong("guildid")).getSelfMember());
+									unBanUser(user, guild, guild.getSelfMember());
 									break;
 							}
 						}
@@ -69,12 +72,12 @@ public class PunishManager {
 
 
 		member.getUser().openPrivateChannel().complete().sendMessage(member.getUser().getAsMention()).setEmbeds(Embed.user(Color.RED,
-				"You have been muted on " + member.getGuild().getName() + " for " + minuteTime + " minutes!\nReason: " + reason,
+				"You have been muted on " + member.getGuild().getName() + " for " + minuteTime + " minutes!\nReason: " + reason + "\nResponsible Moderator: " + moderator.getAsMention(),
 				member.getUser())).queue();
 
 
-		Database.executeUpdate("INSERT INTO punishments(casetype, guildid, userid, expiryDate, reason, active) " +
-				"VALUES('" + CaseType.MUTE + "', " + member.getGuild().getIdLong() + ", " + member.getIdLong() + ", " + (System.currentTimeMillis()+time) + ", '" + reason + "', true)");
+		Database.executeUpdate("INSERT INTO punishments(casetype, guildid, userid, expiryDate, reason, active, moderatorid, punishTime) " +
+				"VALUES('" + CaseType.MUTE + "', " + member.getGuild().getIdLong() + ", " + member.getIdLong() + ", " + (System.currentTimeMillis()+time) + ", '" + reason + "', true, " + moderator.getIdLong() + ", " + System.currentTimeMillis() + ")");
 
 
 
@@ -133,7 +136,7 @@ public class PunishManager {
 
 		user.openPrivateChannel().complete().sendMessage(user.getAsMention()).setEmbeds(Embed.user(
 				Color.RED,
-				"You have been banned on " + guild.getName() + " for " + minuteTime/60 + " hours!\nReason: "+ reason, user
+				"You have been banned on " + guild.getName() + " " + (time != 0 ? "for " + minuteTime/60 + "hours!" : "permanently!") + " \nReason: "+ reason + "\nResponsible Moderator: " + moderator.getAsMention(), user
 				)).queue();
 
 		List<User> bannedUsers = new ArrayList<>();
@@ -142,8 +145,8 @@ public class PunishManager {
 		if (!bannedUsers.contains(user))
 			guild.ban(user, 1, reason).queue();
 
-		Database.executeUpdate("INSERT INTO punishments(casetype, guildid, userid, expiryDate, reason, active) " +
-				"VALUES('" + CaseType.BAN + "', " + guild.getIdLong() + ", " + user.getIdLong() + ", " + (System.currentTimeMillis()+time) + ", '" + reason + "', true)");
+		Database.executeUpdate("INSERT INTO punishments(casetype, guildid, userid, expiryDate, reason, active, moderatorid, punishTime) " +
+				"VALUES('" + CaseType.BAN + "', " + guild.getIdLong() + ", " + user.getIdLong() + ", " + (time != 0 ? (System.currentTimeMillis()+time) : "NULL") + ", '" + reason + "', true, " + moderator.getIdLong() + ", " + System.currentTimeMillis() + ")");
 
 		ResultSet resultSet = Database.executeQuery("SELECT * FROM punishments WHERE userid=" + user.getIdLong() + " && casetype='" + CaseType.BAN +
 				"' && guildid=" + guild.getIdLong() + " && reason='" + reason + "' && active=true" );
@@ -192,8 +195,18 @@ public class PunishManager {
 			resultSet.next();
 			int warningCount = resultSet.getInt(1)+1;
 
-			Database.executeUpdate("INSERT INTO punishments(casetype, guildid, userid, expiryDate, reason, active)" +
-					" VALUES('" + CaseType.WARNING + "', " + member.getGuild().getIdLong() + ", " + member.getIdLong() + ", NULL, '" + reason + "', NULL)");
+			Database.executeUpdate("INSERT INTO punishments(casetype, guildid, userid, expiryDate, reason, active, moderatorid, punishTime)" +
+					" VALUES('" + CaseType.WARNING + "', " + member.getGuild().getIdLong() + ", " + member.getIdLong() + ", NULL, '" + reason + "', NULL, " + moderator.getIdLong() + ", " + System.currentTimeMillis() + ")");
+
+
+			PrivateChannel privateChannel = member.getUser().openPrivateChannel().complete();
+
+			privateChannel.sendMessage(member.getUser().getAsMention()).setEmbeds(Embed.user(Color.RED,
+					"You have been warned on " + member.getGuild().getName() +
+							"\nReason: " + reason +
+							"\nResponsible Moderator: " + moderator.getAsMention() +
+							"\nYour Warning Count: " + warningCount,
+					member.getUser())).queue();
 
 
 			switch (warningCount) {
@@ -206,14 +219,17 @@ public class PunishManager {
 					bot.getPunishManager().banUser(member.getGuild(), member.getUser(), 240, "Automatic TempBan for 9 Warnings", member.getGuild().getSelfMember());
 					break;
 				case 12:
-					bot.getPunishManager().banUser(member.getGuild(), member.getUser(), 241920, "Automatic Ban for 12 Warnings", member.getGuild().getSelfMember());
+					bot.getPunishManager().banUser(member.getGuild(), member.getUser(), 0, "Automatic Ban for 12 Warnings", member.getGuild().getSelfMember());
 					break;
 
 			}
 
+
+
 			ResultSet caseresultSet = Database.executeQuery(
 					"SELECT * FROM punishments WHERE userid=" + member.getIdLong() + " && casetype='" + CaseType.WARNING +
 							"' && guildid=" + member.getGuild().getIdLong() + " && reason='" + reason + "'");
+
 			caseresultSet.first();
 			ModLogHandler.getInstance().log(caseresultSet.getInt("caseid"), moderator);
 			return caseresultSet.getInt("caseid");
@@ -222,13 +238,13 @@ public class PunishManager {
 			return 0;
 		}
 	}
-	public Map<Integer, String> getWarnings(Member member) {
-		Map<Integer, String> warnings = new HashMap<>();
+	public List<Punishment> getPunishments(Member member) {
+		List<Punishment> warnings = new ArrayList<>();
 		try {
-			ResultSet resultSet = Database.executeQuery("SELECT * FROM punishments WHERE userid=" + member.getIdLong() + " AND caseType='" + CaseType.WARNING + "' && guildid=" + member.getGuild().getIdLong());
+			ResultSet resultSet = Database.executeQuery("SELECT * FROM punishments WHERE userid=" + member.getIdLong() + " && guildid=" + member.getGuild().getIdLong());
 
 			while (resultSet.next()) {
-				warnings.put(resultSet.getInt("caseid"), resultSet.getString("reason"));
+				warnings.add(Punishment.makePunishment(resultSet));
 			}
 
 			return warnings;
@@ -257,22 +273,6 @@ public class PunishManager {
 		return guild.getRolesByName(mutedRoleName, true).get(0);
 	}
 
-	public Punishment getPunishment(int caseid) {
-		ResultSet resultSet = Database.executeQuery("SELECT * FROM punishments WHERE caseid=" + caseid);
-		Punishment punishment;
-		try {
-			resultSet.first();
-
-			punishment = new Punishment(resultSet.getInt("caseid"), resultSet.getLong("guildid"), resultSet.getLong("userid"), resultSet.getString("reason"), resultSet.getBoolean("active"), resultSet.getString("casetype"));
-
-		} catch (SQLException throwables) {
-			throwables.printStackTrace();
-			return null;
-		}
-
-
-		return punishment;
-	}
 
 }
 

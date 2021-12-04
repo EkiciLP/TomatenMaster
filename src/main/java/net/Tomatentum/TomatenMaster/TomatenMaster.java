@@ -89,7 +89,7 @@ public class TomatenMaster {
 		cmdmanager.registerCommand(new EditEmbedCommand(this));
 		cmdmanager.registerCommand(new LockCommand());
 		cmdmanager.registerCommand(new WarnCommand(this));
-		cmdmanager.registerCommand(new WarningsCommand(this));
+		cmdmanager.registerCommand(new PunishmentsCommand(this));
 		cmdmanager.registerCommand(new MuteCommand(this));
 		cmdmanager.registerCommand(new UnmuteCommand());
 		cmdmanager.registerCommand(new BanCommand(this));

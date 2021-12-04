@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.User;
 import java.awt.*;
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 public class Embed {
 
@@ -55,6 +56,20 @@ public class Embed {
 		builder.setDescription(text);
 		builder.setThumbnail(user.getAvatarUrl());
 		builder.setTimestamp(OffsetDateTime.now());
+
+		return builder.build();
+	}
+
+	public static MessageEmbed fieldEmbed(String title, String description, User user, List<MessageEmbed.Field> fields) {
+		EmbedBuilder builder = new EmbedBuilder();
+
+		builder.setTitle(title);
+		builder.setDescription(description);
+		builder.setTimestamp(OffsetDateTime.now());
+		builder.setAuthor(user.getName(), null, user.getAvatarUrl());
+		for (MessageEmbed.Field field : fields) {
+			builder.addField(field);
+		}
 
 		return builder.build();
 	}
